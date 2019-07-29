@@ -18,9 +18,9 @@ class Circle(var center: Vec, var radius: Float, var color: Color) {
     var strokeWeight = 0f
 
     fun mutate() {
-        vecRange.mutate(center, 0.003f)
+        vecRange.mutate(center, 0.006f)
         radius = radiusRange.mutate(radius, 0.08f)
-        color = colorRange.mutate(color, 0.05f)
+        color = colorRange.mutate(color, 0.06f)
 //        if (radius == radiusRange.end)
 //            println("top is reached")
 
