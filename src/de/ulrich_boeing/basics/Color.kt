@@ -36,7 +36,7 @@ inline class Color(val rgba: Int) {
     inline fun setGreen(green: Int): Color = fromRGBA(red, green, blue, alpha)
     inline fun setBlue(blue: Int): Color = fromRGBA(red, green, blue, alpha)
 
-    inline fun getDiff(other: Color): Int {
+    fun getDiff(other: Color): Int {
         val redDiff = (red - other.red).absoluteValue
         val greenDiff = (green - other.green).absoluteValue
         val blueDiff = (blue - other.blue).absoluteValue
