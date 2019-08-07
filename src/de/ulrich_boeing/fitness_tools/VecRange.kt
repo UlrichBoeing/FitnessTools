@@ -10,9 +10,10 @@ class VecRange(val start: Vec, val end: Vec) {
 
     fun random(): Vec = Vec(xRange.random(), yRange.random())
 
-    fun mutate(vec: Vec, range: Float) {
-        vec.x = xRange.mutate(vec.x, range)
-        vec.y = yRange.mutate(vec.y, range)
+    fun mutate(vec: Vec, range: Float):Vec {
+        val x = xRange.mutate(vec.x, range)
+        val y = yRange.mutate(vec.y, range)
+        return Vec(x , y)
     }
 
 
