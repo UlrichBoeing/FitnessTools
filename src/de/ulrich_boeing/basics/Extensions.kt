@@ -47,18 +47,85 @@ fun PImage.toByteArray(): ByteArray {
     return arr
 }
 
+// g must have the same dimensions as image
+fun PImage.getDifference(g: PGraphics, clippings: Array<Clipping>): Long {
+    g.loadPixels()
+    var sum = 0L
+    for (clipping in clippings) {
+        sum += this.getDifference(g, clipping)
+    }
+    return sum
+}
+
+// g must have the same dimensions as image
+fun PImage.getDifference(g: PGraphics, clipping: Clipping): Long {
+    val imageClipping = Clipping(0, 0, this.width, this.height)
+    val intersection = imageClipping.intersect(clipping)
+
+    val xRange = intersection.left until intersection.right
+    val yRange = intersection.top until intersection.bottom
+
+    var sum = 0L
+    for (y in yRange) {
+        for (x in xRange) {
+            val i = x + y * this.width
+
+            val r1 = (this.pixels[i] shr 16) and 0xFF
+            val g1 = (this.pixels[i] shr 8) and 0xFF
+            val b1 = this.pixels[i] and 0xFF
+
+
+            val r2 = (g.pixels[i] shr 16) and 0xFF
+            val g2 = (g.pixels[i] shr 8) and 0xFF
+            val b2 = g.pixels[i] and 0xFF
+
+            sum += (r1 - r2).absoluteValue + (g1 - g2).absoluteValue + (b1 - b2).absoluteValue
+        }
+        g.updatePixels()
+    }
+    return sum
+
+}
+
+// g must have the same dimensions as image
+fun PImage.getDifference(g: PGraphics): Long {
+    g.loadPixels()
+    var sum = 0L
+    for (i in g.pixels.indices) {
+        val r1 = (this.pixels[i] shr 16) and 0xFF
+        val g1 = (this.pixels[i] shr 8) and 0xFF
+        val b1 = this.pixels[i] and 0xFF
+
+
+        val r2 = (g.pixels[i] shr 16) and 0xFF
+        val g2 = (g.pixels[i] shr 8) and 0xFF
+        val b2 = g.pixels[i] and 0xFF
+
+        sum += (r1 - r2).absoluteValue + (g1 - g2).absoluteValue + (b1 - b2).absoluteValue
+    }
+    g.updatePixels()
+    return sum
+}
+
 fun PImage.getDifference(g: PGraphics, xOffset: Int, yOffset: Int): Long {
-    var sum: Long = 0
+    val imageClipping = Clipping(0, 0, this.width, this.height)
+    val gClipping = Clipping(xOffset, yOffset, g.width, g.height)
+    val intersection = imageClipping.intersect(gClipping)
+
+    val xRange = intersection.left until intersection.right
+    val yRange = intersection.top until intersection.bottom
 
     g.loadPixels()
-    for (y in 0 until g.height) {
-        for (x in 0 until g.width) {
-            val i1 = (x + xOffset) + (y + yOffset) * this.width
-            val i2 = x + y * g.width
+    var sum = 0L
+    for (y in yRange) {
+        for (x in xRange) {
+            val i1 = x + y * this.width
+            val i2 = (x - intersection.x) + ((y - intersection.y) * g.width)
 
             val r1 = (this.pixels[i1] shr 16) and 0xFF
             val g1 = (this.pixels[i1] shr 8) and 0xFF
             val b1 = this.pixels[i1] and 0xFF
+
 
             val r2 = (g.pixels[i2] shr 16) and 0xFF
             val g2 = (g.pixels[i2] shr 8) and 0xFF
@@ -66,48 +133,28 @@ fun PImage.getDifference(g: PGraphics, xOffset: Int, yOffset: Int): Long {
 
             sum += (r1 - r2).absoluteValue + (g1 - g2).absoluteValue + (b1 - b2).absoluteValue
         }
+        g.updatePixels()
     }
     return sum
 }
+
+// Performing a weighted choice, the higher the value the more likely it is to be picked
+fun Array<Float>.selectOne(): Int {
+    var r = Random.nextFloat() * this.sum()
+
+    var index = -1
+    do {
+        r -= this[++index]
+    } while (r > 0)
+    return index
+}
+
+fun Array<Float>.mix(other: Array<Float>, split: Int): Array<Float> =
+    Array(size) { i -> if (i < split) this[i] else other[i] }
+
+
 
 fun red(color: Int): Int = (color shr 16) and 0xFF
 fun green(color: Int): Int = (color shr 8) and 0xFF
 fun blue(color: Int): Int = color and 0xFF
 
-
-fun PImage.sumRGBRect(rect: IntRect): Int {
-    var sum: Int = 0
-    for (x in rect.x until rect.x + rect.width) {
-        for (y in rect.y until rect.y + rect.height) {
-            val i = x + y * this.width
-            val r = pixels[i] shr 16 and 0xFF  // Faster way of getting red(argb)
-            val g = pixels[i] shr 8 and 0xFF   // Faster way of getting green(argb)
-            val b = pixels[i] and 0xFF          // Faster way of getting blue(argb)
-            sum += r + rgbDifference(g, b)
-
-        }
-    }
-    return sum
-}
-
-fun PImage.sumRGB(): Int {
-    var sum: Int = 0
-
-//    this.loadPixels()
-    for (i in this.pixels.indices) {
-//        val color = Color(pixels[i])
-//        sum +=  color.red + color.green + color.blue
-
-        val r = pixels[i] shr 16 and 0xFF  // Faster way of getting red(argb)
-        val g = pixels[i] shr 8 and 0xFF   // Faster way of getting green(argb)
-        val b = pixels[i] and 0xFF          // Faster way of getting blue(argb)
-        sum += r + rgbDifference(g, b)
-    }
-//    this.updatePixels()
-
-    return sum
-}
-
-inline fun rgbDifference(color1: Int, color2: Int): Int {
-    return color1 + color2
-}

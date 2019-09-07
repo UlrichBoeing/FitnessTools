@@ -8,6 +8,7 @@ inline class Color(val rgba: Int) {
         val white = fromRGBA(255, 255, 255, 255)
         val black = fromRGBA(0, 0, 0, 255)
         val red = fromRGBA(255, 0, 0, 255)
+        val green = fromRGBA(0, 255, 0, 255)
         val blue = fromRGBA(0, 0, 255, 255)
         inline fun fromRGBA(red: Int, green: Int, blue: Int, alpha: Int): Color =
             Color((alpha shl 24) or (red shl 16) or (green shl 8) or blue)
@@ -35,6 +36,14 @@ inline class Color(val rgba: Int) {
     inline fun setRed(red: Int): Color = fromRGBA(red, green, blue, alpha)
     inline fun setGreen(green: Int): Color = fromRGBA(red, green, blue, alpha)
     inline fun setBlue(blue: Int): Color = fromRGBA(red, green, blue, alpha)
+
+    fun lerp(other: Color, amount: Float): Color {
+        val newRed = lerp(red, other.red, amount)
+        val newGreen = lerp(green, other.green, amount)
+        val newBlue = lerp(blue, other.blue, amount)
+        val newAlpha = lerp(alpha, other.alpha, amount)
+        return fromRGBA(newRed, newGreen, newBlue, newAlpha)
+    }
 
     fun getDiff(other: Color): Int {
         val redDiff = (red - other.red).absoluteValue
