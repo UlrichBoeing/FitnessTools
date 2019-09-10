@@ -139,7 +139,7 @@ fun PImage.getDifference(g: PGraphics, xOffset: Int, yOffset: Int): Long {
 }
 
 // Performing a weighted choice, the higher the value the more likely it is to be picked
-fun Array<Float>.selectOne(): Int {
+fun FloatArray.selectOne(): Int {
     var r = Random.nextFloat() * this.sum()
 
     var index = -1
@@ -149,9 +149,42 @@ fun Array<Float>.selectOne(): Int {
     return index
 }
 
-fun Array<Float>.mix(other: Array<Float>, split: Int): Array<Float> =
-    Array(size) { i -> if (i < split) this[i] else other[i] }
+fun FloatArray.indexOfHighest(count : Int): IntArray {
+    val highest = IntArray(count)
+    val cache = FloatArray(count)
+    for (i in highest.indices) {
+        highest[i] = this.indexOfMax()
+        cache[i] = this[highest[i]]
+        this[highest[i]] = Float.MIN_VALUE
+    }
+    for (i in highest.indices)
+        this[highest[i]] = cache[i]
 
+    return highest
+}
+
+fun FloatArray.indexOfMax(): Int =
+    this.indices.maxBy { this[it] } ?: throw RuntimeException("index of max value could not be found")
+
+
+fun FloatArray.indexOfMin(): Int =
+    this.indices.minBy { this[it] } ?: throw RuntimeException("index of min value could not be found")
+
+fun FloatArray.norm() {
+    val min = this.min() ?: 0f
+    val max = this.max() ?: 1f
+    var range = max - min
+    if (range < 0.00001f)
+        range = 0.00001f
+
+    println("min $min max $max")
+    for (i in this.indices) {
+        this[i] = ((this[i] - min) / (range))
+    }
+}
+
+fun FloatArray.mix(other: FloatArray, split: Int): FloatArray =
+    FloatArray(size) { i -> if (i < split) this[i] else other[i] }
 
 
 fun red(color: Int): Int = (color shr 16) and 0xFF
