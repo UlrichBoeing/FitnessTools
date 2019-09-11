@@ -1,21 +1,21 @@
 package de.ulrich_boeing.basics
 
-class HistoryList<T>(val maxSize: Int)  {
-    private val arr = Array<Object?>(maxSize) { null }
+class HistoryList<T>(val capacity: Int)  {
+    private val arr = Array<Object?>(capacity) { null }
     var added = 0L
 
     private val addedIndex
         get() = added - 1
 
     val size : Int
-        get() = if (added < maxSize) added.toInt() else maxSize
+        get() = if (added < capacity) added.toInt() else capacity
 
     val indices: IntRange
         get() = 0 until size
 
     fun add(element: T) {
         added++
-        val i = (addedIndex % maxSize).toInt()
+        val i = (addedIndex % capacity).toInt()
         arr[i] = element as Object
     }
 
@@ -23,7 +23,7 @@ class HistoryList<T>(val maxSize: Int)  {
         if (addedIndex < index) {
             return throw IllegalArgumentException("Wrong index value for HistoryList")
         }
-        val i = ((addedIndex - index) % maxSize).toInt()
+        val i = ((addedIndex - index) % capacity).toInt()
         return arr[i] as T
     }
 }

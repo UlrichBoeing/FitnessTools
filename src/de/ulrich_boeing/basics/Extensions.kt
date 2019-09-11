@@ -177,7 +177,6 @@ fun FloatArray.norm() {
     if (range < 0.00001f)
         range = 0.00001f
 
-    println("min $min max $max")
     for (i in this.indices) {
         this[i] = ((this[i] - min) / (range))
     }

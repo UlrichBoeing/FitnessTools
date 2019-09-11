@@ -1,14 +1,12 @@
 package de.ulrich_boeing.adaptable
 
-import com.sun.javafx.scene.control.skin.VirtualFlow
 import de.ulrich_boeing.basics.*
 import de.ulrich_boeing.fitness_tools.FloatRange
 import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
-import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -18,22 +16,22 @@ typealias Structure = Array<Vec>
 class PopulationStats(val bestFitness: Float, val worstFitness: Float)
 
 class AdaptableStats() {
-    val populationStats = ArrayList<PopulationStats>(200)
-    val history: Queue<PopulationStats> = ArrayDeque<PopulationStats>()
-
-    fun test() {
-        history.add(PopulationStats(0f, 0f))
-        if (history.size == 10)
-            history.remove()
-        for (item in history) {
-            println(item.bestFitness)
-            history.remove(item)
-        }
-    }
+    val history = HistoryList<PopulationStats>(5)
 
 
     var generations: Int = 0
     var bestFitness = -1f
+    var fitnessWorse = 0
+    var fitnessEqual = 0
+
+    fun update() {
+        if (history.size > 1) {
+            if (history[0].bestFitness < history[1].bestFitness)
+                fitnessWorse++
+            else if (history[0].bestFitness == history[1].bestFitness)
+                fitnessEqual++
+        }
+    }
 }
 
 class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: Int = 1) {
@@ -49,8 +47,9 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
     */
     private val sizeDNA = 7
     var population = initPopulation()
-    var mutationRate = 0.06f
-    var mutationRange = 0.02f
+    var mutationRate = 0.04f
+    var mutationRange = 0.1f
+    var eliteRate = 0.1f
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     val stats = AdaptableStats()
 
@@ -60,7 +59,8 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
     var allNormStructures = createAllNormStructures()
     var fitness = FloatArray(populationCount)
 
-    fun createAllNormStructures(): Array<Structure> = Array(populationCount) { i -> createNormStructure(population[i]) }
+    fun createAllNormStructures(): Array<Structure> =
+        Array(populationCount) { i -> createNormStructure(population[i]) }
 
     fun createNormStructure(dna: DNA): Structure {
         val start = angleStepSize * (dna.last() - 0.5f)
@@ -130,31 +130,47 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
 
     fun getBestFitness(): Int = fitness.indexOfMax()
 
-    fun mutate(dna: DNA) {
+    fun mutate(dna: DNA): DNA {
+        val newDNA = dna.copyOf()
         for (i in dna.indices) {
             if (Random.nextFloat() < mutationRate) {
                 val new = Random.nextFloat()
-                dna[i] = (1 - mutationRange) * dna[i] + mutationRange * new
+                newDNA[i] = (1 - mutationRange) * dna[i] + mutationRange * new
             }
         }
+        return newDNA
     }
 
     private fun initDNA(): DNA = FloatArray(sizeDNA) { Random.nextFloat() }
 
     private fun initPopulation(): Array<DNA> = Array(populationCount) { initDNA() }
 
-    private fun createDNA(): DNA {
+    private fun createCrossoverDNA(): DNA {
         val i1 = fitness.selectOne()
         val i2 = fitness.selectOne()
-        val newDNA = population[i1].mix(population[i2], Random.nextInt(sizeDNA - 1))
-        mutate(newDNA)
-        return newDNA
+        val crossoverDNA = population[i1].mix(population[i2], Random.nextInt(1, sizeDNA - 2))
+        return mutate(crossoverDNA)
     }
 
-    private fun createPopulation(): Array<DNA> = Array(populationCount) { createDNA() }
+    private fun createElitePopulation(count: Int): Array<DNA> {
+        val eliteIndices = fitness.indexOfHighest(count)
+        return Array(count) { i -> population[eliteIndices[i]] }
+    }
+
+    private fun createCrossoverPopulation(count: Int) = Array(count) { createCrossoverDNA()}
+
+    private fun createPopulation(): Array<DNA> {
+        val eliteCount = (populationCount * eliteRate).roundToInt().coerceAtLeast(1)
+        val elite = createElitePopulation(eliteCount)
+        val eliteMutation = Array(eliteCount) { i -> mutate(elite[i]) }
+        return  elite + eliteMutation + createCrossoverPopulation(populationCount - 2 * eliteCount)
+    }
+
+//    private fun createPopulation(): Array<DNA> = Array(populationCount) { i -> createDNA(i) }
 
     private fun evaluatePopulation() {
-        stats.populationStats.add(PopulationStats(fitness.max() ?: 0f, fitness.min() ?: 0f))
+        stats.history.add(PopulationStats(fitness.max() ?: 0f, fitness.min() ?: 0f))
+        stats.update()
     }
 
     fun nextGeneration(target: PImage, targetClipping: Clipping) {
