@@ -170,6 +170,11 @@ fun FloatArray.indexOfMax(): Int =
 fun FloatArray.indexOfMin(): Int =
     this.indices.minBy { this[it] } ?: throw RuntimeException("index of min value could not be found")
 
+fun FloatArray.setSum(sum: Float): FloatArray {
+    val factor = sum / this.sum()
+    return FloatArray(this.size) { i -> this[i] * factor}
+}
+
 fun FloatArray.norm() {
     val min = this.min() ?: 0f
     val max = this.max() ?: 1f

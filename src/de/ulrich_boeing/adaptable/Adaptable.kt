@@ -1,6 +1,7 @@
 package de.ulrich_boeing.adaptable
 
 import de.ulrich_boeing.basics.*
+import de.ulrich_boeing.fitness_tools.ColorRange
 import de.ulrich_boeing.fitness_tools.FloatRange
 import processing.core.PApplet
 import processing.core.PGraphics
@@ -38,14 +39,14 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
     /*
         Fixed parameter of Adaptable
     */
-    val pointsCount = 6
-    val radiusRange = FloatRange(0.1f, 0.95f)
-    val color = Color.fromRGBA(0, 0, 255, 180)
+    val pointsCount = 12
+    val radiusRange = FloatRange(0.2f, 1f)
+    val colorRange = ColorRange(Color.white, Color.black)
 
     /*
         parameter of the genetic algorithm
     */
-    private val sizeDNA = 7
+    private val sizeDNA = pointsCount + 1
     var population = initPopulation()
     var mutationRate = 0.04f
     var mutationRange = 0.1f
@@ -53,17 +54,24 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     val stats = AdaptableStats()
 
+    /*
+        Flexible Parameter from DNA
+    */
+    var allNormStructures = createAllNormStructures()
+    var color = Color.fromRGBA(255,0, 0, 255)
 
     // Cache Variables
     val angleStepSize = Vec.TAU / pointsCount
-    var allNormStructures = createAllNormStructures()
     var fitness = FloatArray(populationCount)
 
     fun createAllNormStructures(): Array<Structure> =
         Array(populationCount) { i -> createNormStructure(population[i]) }
 
     fun createNormStructure(dna: DNA): Structure {
-        val start = angleStepSize * (dna.last() - 0.5f)
+//        color = colorRange.lerp(dna[pointsCount +1], dna[pointsCount + 2], dna[pointsCount +3])
+        val testDNA = dna.setSum(4f)
+
+        val start = angleStepSize * (dna[pointsCount] - 0.5f)
         val angles = FloatArray(pointsCount) { i ->
             start + i * angleStepSize
         }
@@ -92,6 +100,8 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
         val g = app.createGraphics(width, height)
         g.beginDraw()
         g.background(0)
+//        g.image(target, 0f, 0f)
+
         g.noStroke()
 
         g.translate(width / 2f, height / 2f)
@@ -157,13 +167,13 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
         return Array(count) { i -> population[eliteIndices[i]] }
     }
 
-    private fun createCrossoverPopulation(count: Int) = Array(count) { createCrossoverDNA()}
+    private fun createCrossoverPopulation(count: Int) = Array(count) { createCrossoverDNA() }
 
     private fun createPopulation(): Array<DNA> {
         val eliteCount = (populationCount * eliteRate).roundToInt().coerceAtLeast(1)
         val elite = createElitePopulation(eliteCount)
         val eliteMutation = Array(eliteCount) { i -> mutate(elite[i]) }
-        return  elite + eliteMutation + createCrossoverPopulation(populationCount - 2 * eliteCount)
+        return elite + eliteMutation + createCrossoverPopulation(populationCount - 2 * eliteCount)
     }
 
 //    private fun createPopulation(): Array<DNA> = Array(populationCount) { i -> createDNA(i) }
