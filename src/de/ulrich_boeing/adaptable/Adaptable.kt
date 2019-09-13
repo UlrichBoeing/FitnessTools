@@ -39,9 +39,9 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
     /*
         Fixed parameter of Adaptable
     */
-    val pointsCount = 12
-    val radiusRange = FloatRange(0.2f, 1f)
-    val colorRange = ColorRange(Color.white, Color.black)
+    val pointsCount = 16
+    val radiusRange = FloatRange(-0.2f, 1f)
+    var color = Color.fromRGBA(255,0, 0, 255)
 
     /*
         parameter of the genetic algorithm
@@ -57,20 +57,16 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
     /*
         Flexible Parameter from DNA
     */
-    var allNormStructures = createAllNormStructures()
-    var color = Color.fromRGBA(255,0, 0, 255)
-
     // Cache Variables
     val angleStepSize = Vec.TAU / pointsCount
+    var allNormStructures = createAllNormStructures()
+
     var fitness = FloatArray(populationCount)
 
     fun createAllNormStructures(): Array<Structure> =
         Array(populationCount) { i -> createNormStructure(population[i]) }
 
     fun createNormStructure(dna: DNA): Structure {
-//        color = colorRange.lerp(dna[pointsCount +1], dna[pointsCount + 2], dna[pointsCount +3])
-        val testDNA = dna.setSum(4f)
-
         val start = angleStepSize * (dna[pointsCount] - 0.5f)
         val angles = FloatArray(pointsCount) { i ->
             start + i * angleStepSize
