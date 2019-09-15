@@ -1,11 +1,12 @@
 package de.ulrich_boeing.adaptable
 
 import de.ulrich_boeing.basics.Clipping
+import processing.core.PApplet
 import java.lang.Float.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class AdaptableRect(val frame: Clipping, var sizeFactor: Float, val aspectRatio: Float) {
+class AdaptableRect(app: PApplet, frame: Clipping, var sizeFactor: Float, val aspectRatio: Float) : Adaptable(app, frame) {
     val size: Float
         get() = frame.size * sizeFactor
 
