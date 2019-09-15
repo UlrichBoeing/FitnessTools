@@ -12,6 +12,7 @@ import kotlin.math.*
  */
 class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
     constructor () : this(Int.MIN_VALUE, Int.MIN_VALUE, 0, 0)
+    constructor(x: Float, y: Float, width: Float, height: Float): this(x.roundToInt(), y.roundToInt(),width.roundToInt(), height.roundToInt())
 
     companion object {
         fun fromVertices(left: Int, top: Int, right: Int, bottom: Int) = Clipping(left, top, right - left, bottom - top)
@@ -23,6 +24,8 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
             val bottom = ceil(rect.bottom).toInt() + margin
             return Clipping(x, y, right - x, bottom - y)
         }
+
+        fun fromRect(rect: Rect): Clipping = Clipping(rect.x.roundToInt(), rect.y.roundToInt(), rect.width.roundToInt(), rect.height.roundToInt())
     }
 
     var width = width
@@ -67,6 +70,9 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
 
     val center: Vec
         get() = Vec(x + width / 2f, y + height / 2f)
+
+    val size: Int
+        get() = width * height
 
     // ok
     val vertices: Array<Point>

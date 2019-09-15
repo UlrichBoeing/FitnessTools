@@ -27,6 +27,10 @@ class Look(val fill: Color, val stroke: Color, val strokeWeight: Float = 1f) {
         val solidGreenOutline = Look(
             Color.fromRGBA(0, 255, 0, 128),
             Color.fromRGBA(255, 255, 255, 128))
+        val transparentRed = Look(
+            Color.fromRGBA(255, 0, 0, 30),
+            Color.fromRGBA(0, 0, 0, 0), 0f)
+
 
     }
     fun set(g: PGraphics) {

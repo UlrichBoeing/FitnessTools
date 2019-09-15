@@ -39,8 +39,8 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
     /*
         Fixed parameter of Adaptable
     */
-    val pointsCount = 16
-    val radiusRange = FloatRange(-0.2f, 1f)
+    val pointsCount = 6
+    val radiusRange = FloatRange(0.2f, 1f)
     var color = Color.fromRGBA(255,0, 0, 255)
 
     /*
@@ -95,7 +95,7 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
         val height = targetClipping.height
         val g = app.createGraphics(width, height)
         g.beginDraw()
-        g.background(0)
+//        g.background(0)
 //        g.image(target, 0f, 0f)
 
         g.noStroke()
@@ -112,6 +112,12 @@ class Adaptable(val app: PApplet, val clipping: Clipping, val populationCount: I
 //        curveVertex(center.x + vecs[2].x, center.y + vecs[2].y)
         g.endShape()
         g.endDraw()
+
+        g.loadPixels()
+        for (i in g.pixels) {
+            val a = (i shr 24) and 0xFF
+        }
+        g.updatePixels()
         return g
     }
 
