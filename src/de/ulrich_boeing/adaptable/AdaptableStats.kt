@@ -14,6 +14,7 @@ class AdaptableStats() {
     var fitnessEqual = 0
 
     fun update() {
+        generations++
         if (history.size > 1) {
             if (history[0].bestFitness < history[1].bestFitness)
                 fitnessWorse++
