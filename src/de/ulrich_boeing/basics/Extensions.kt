@@ -88,23 +88,27 @@ fun PImage.getDifference(g: PGraphics, clipping: Clipping): Long {
 }
 
 // g must have the same dimensions as image
-fun PImage.getDifference(g: PGraphics): Long {
+fun PImage.getDifference(g: PGraphics): Float {
     g.loadPixels()
     var sum = 0L
+    var count = 0L
     for (i in g.pixels.indices) {
-        val r1 = (this.pixels[i] shr 16) and 0xFF
-        val g1 = (this.pixels[i] shr 8) and 0xFF
-        val b1 = this.pixels[i] and 0xFF
+        val gAlpha = (g.pixels[i] shr 24) and 0xFF
+        if (gAlpha != 0) {
+            val r1 = (this.pixels[i] shr 16) and 0xFF
+            val g1 = (this.pixels[i] shr 8) and 0xFF
+            val b1 = this.pixels[i] and 0xFF
 
 
-        val r2 = (g.pixels[i] shr 16) and 0xFF
-        val g2 = (g.pixels[i] shr 8) and 0xFF
-        val b2 = g.pixels[i] and 0xFF
-
-        sum += (r1 - r2).absoluteValue + (g1 - g2).absoluteValue + (b1 - b2).absoluteValue
+            val r2 = (g.pixels[i] shr 16) and 0xFF
+            val g2 = (g.pixels[i] shr 8) and 0xFF
+            val b2 = g.pixels[i] and 0xFF
+            sum += (r1 - r2).absoluteValue + (g1 - g2).absoluteValue + (b1 - b2).absoluteValue
+            count++
+        }
     }
     g.updatePixels()
-    return sum
+    return sum.toFloat() / count
 }
 
 fun PImage.getDifference(g: PGraphics, xOffset: Int, yOffset: Int): Long {
@@ -145,7 +149,7 @@ fun FloatArray.selectOne(): Int {
     var index = -1
     do {
         r -= this[++index]
-    } while (r > 0)
+    } while (r > 0 && index < (size -1))
     return index
 }
 

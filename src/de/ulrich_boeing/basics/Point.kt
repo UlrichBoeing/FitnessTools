@@ -1,3 +1,6 @@
 package de.ulrich_boeing.basics
 
-data class Point(var x: Int, var y: Int)
+class Point(x: Float, y: Float, var color: Int) : Vec(x, y){
+    constructor(vec: Vec, color: Int) : this(vec.x, vec.y, color)
+    constructor(x: Int, y: Int, color: Int) : this(x.toFloat(), y.toFloat(), color)
+}

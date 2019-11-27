@@ -1,41 +1,53 @@
 package de.ulrich_boeing.fitness_tools
 
-import org.tinylog.kotlin.Logger
-import java.lang.IllegalArgumentException
+import java.lang.Float.max
+import java.lang.Float.min
 import kotlin.random.Random
 
 /**
  *  Holds a value between
  *  start (inclusive) and end (exclusive)
  */
-class FloatRange(val start: Float, val end: Float) {
-    init {
-        require(end >= start) { "end $end is smaller than start $start" }
-    }
+class FloatRange(start: Float, end: Float = start) {
+    private val constant = (start == end)
+    val min = min(start, end)
+    val max = max(start, end)
+
+    fun lerp(pos: Float): Float =
+        if (constant) min
+        else (min + pos * (max - min))
 
     /**
      *  Gets a random value between
      *  start (inclusive) and end (exclusive)
      *  */
-    fun random(): Float = expand(Random.nextFloat())
+    fun random(): Float =
+        if (constant) min
+        else expand(Random.nextFloat())
 
     /**
      * Mutate the value.
      * @param range between 0 - 1
      *
      */
-    fun mutate(value: Float, range: Float): Float = (1 - range) * value + range * random()
+    fun mutate(value: Float, range: Float): Float =
+        if (constant) min
+        else (1 - range) * value + range * random()
 
 
     /**
      *  The inverse function to normalize ✔
      */
-    public fun expand(value: Float): Float = start + value * (end - start)
+    public fun expand(value: Float): Float =
+        if (constant) min
+        else min + value * (max - min)
 
     /**
      *  Normalizing a value ✔
      */
-    private fun normalize(value: Float): Float = (value - start) / (end - start)
+    private fun normalize(value: Float): Float =
+        if (constant) 0f
+        else (value - min) / (max - min)
 
 
     /**
@@ -43,9 +55,31 @@ class FloatRange(val start: Float, val end: Float) {
      */
     fun check(value: Float): Float {
         return when {
-            value < start -> start
-            value > end -> end
+            value < min -> min
+            value > max -> max
             else -> value
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FloatRange
+
+        if (min != other.min) return false
+        if (max != other.max) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = min.hashCode()
+        result = 31 * result + max.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "FloatRange(constant=$constant, min=$min, max=$max)"
     }
 }

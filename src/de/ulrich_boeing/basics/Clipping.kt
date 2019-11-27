@@ -2,6 +2,7 @@ package de.ulrich_boeing.basics
 
 import de.ulrich_boeing.elements.Layout
 import de.ulrich_boeing.processing.Look
+import de.ulrich_boeing.processing.set
 import processing.core.PGraphics
 import java.lang.RuntimeException
 import kotlin.math.*
@@ -12,7 +13,12 @@ import kotlin.math.*
  */
 class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
     constructor () : this(Int.MIN_VALUE, Int.MIN_VALUE, 0, 0)
-    constructor(x: Float, y: Float, width: Float, height: Float): this(x.roundToInt(), y.roundToInt(),width.roundToInt(), height.roundToInt())
+    constructor(x: Float, y: Float, width: Float, height: Float) : this(
+        x.roundToInt(),
+        y.roundToInt(),
+        width.roundToInt(),
+        height.roundToInt()
+    )
 
     companion object {
         fun fromVertices(left: Int, top: Int, right: Int, bottom: Int) = Clipping(left, top, right - left, bottom - top)
@@ -25,8 +31,12 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
             return Clipping(x, y, right - x, bottom - y)
         }
 
-        fun fromRect(rect: Rect): Clipping = Clipping(rect.x.roundToInt(), rect.y.roundToInt(), rect.width.roundToInt(), rect.height.roundToInt())
+        fun fromRect(rect: Rect): Clipping =
+            Clipping(rect.x.roundToInt(), rect.y.roundToInt(), rect.width.roundToInt(), rect.height.roundToInt())
     }
+
+    var color = COLOR_WHITE
+    var strokeWeight = 0f
 
     var width = width
         set(value) {
@@ -74,12 +84,14 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
     val size: Int
         get() = width * height
 
-    // ok
-    val vertices: Array<Point>
-        get() = arrayOf(Point(x, y), Point(right, y), Point(x, bottom), Point(right, bottom))
+    val aspectRatio = width.toFloat() / height.toFloat()
 
     // ok
-    fun contains(p: Point): Boolean {
+    val vertices: Array<IntVec>
+        get() = arrayOf(IntVec(x, y), IntVec(right, y), IntVec(x, bottom), IntVec(right, bottom))
+
+    // ok
+    fun contains(p: IntVec): Boolean {
         return !(p.x < x || p.x > right || p.y < y || p.y > bottom)
     }
 
@@ -97,6 +109,23 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
                 numberVertices++
 
         return numberVertices
+    }
+
+    fun center(other: Clipping): Clipping {
+        val newX = x + (width - other.width) / 2
+        val newY = y + (height - other.height) / 2
+        return Clipping(newX, newY, other.width, other.height)
+    }
+
+    // clipping other will be changed
+    fun shrinkInto(other: Clipping): Clipping {
+        if (other.aspectRatio > aspectRatio) {
+            val newHeight = (other.height.toFloat() * width/ other.width).roundToInt()
+            return Clipping(x, y, width, newHeight)
+        } else {
+            val newWidth = (other.width.toFloat() * height / other.height).roundToInt()
+            return Clipping(x, y, newWidth, height)
+        }
     }
 
     fun exactUnion(other: Clipping): Array<Clipping> {
@@ -236,13 +265,10 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
         return "Clipping(x=$x, y=$y, width=$width, height=$height)"
     }
 
-    fun draw(look: Look, pGraphics: PGraphics? = null) {
-        val g = pGraphics ?: Layout.app.g
-        look.set(g)
+    fun draw(g: PGraphics) {
+        g.set(color, strokeWeight)
         g.rect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat())
     }
-
-
 }
 
 class PointClipping(var x1: Int, var y1: Int, var x2: Int, var y2: Int) {

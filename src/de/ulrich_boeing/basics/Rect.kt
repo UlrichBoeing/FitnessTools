@@ -5,6 +5,10 @@ import de.ulrich_boeing.processing.Look
 import processing.core.PGraphics
 import kotlin.math.ceil
 import kotlin.math.floor
+import javax.swing.Spring.width
+import javax.swing.Spring.height
+import kotlin.math.sqrt
+
 
 class Rect(var x: Float, var y: Float, width: Float, height: Float) {
     constructor(x: Int, y: Int, width: Int, height: Int) : this(
@@ -14,6 +18,8 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
         height.toFloat()
     )
 
+    constructor(): this(0f, 0f, 0f, 0f)
+    constructor(width: Int, height: Int): this(0f, 0f, width.toFloat(), height.toFloat())
     constructor(other: Rect) : this(other.x, other.y, other.width, other.height)
 
     companion object {
@@ -23,27 +29,41 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
         }
     }
 
-    private var _width: Float = 0f
-    private var _height: Float = 0f
-    var width: Float
-        get() = _width
+    var width: Float = 0f
+        get() = field
         set(value) {
             if (value < 0f) {
                 println("Width $value in Rect can not be negative.")
-                _width = 0f
+                field = 0f
             } else
 
-                _width = value
+                field = value
         }
-    var height: Float
-        get() = _height
+
+    var height: Float = 0f
+        get() = field
         set(value) {
             if (value < 0f) {
                 println("Height $value in Rect can not be negative.")
-                _height = 0f
+                field = 0f
             } else
-                _height = value
+                field = value
         }
+
+    val aspectRatio: Float = width / height
+
+    /**
+     * standard rectangle has a size of 1 Million Pixel.
+     *
+     * @return the rectangle
+     */
+    val standardRect: Rect
+        get() {
+        val numPixels = 1000000
+        val newWidth = sqrt(numPixels * aspectRatio)
+        val newHeight = height * (newWidth / width)
+        return Rect(x, y, newWidth, newHeight)
+    }
 
     init {
         this.width = width
@@ -81,6 +101,8 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
         return !(x > other.right || right < other.x || y > other.bottom || bottom < other.y)
     }
 
+    fun inside(x: Int, y: Int): Boolean =  !(x < left || x > right || y < top || y > bottom)
+
     fun getEnclosingRectangle(other: Rect): Rect {
         val new = Rect(0, 0, 0, 0)
         new.left = if (left < other.left) left else other.left
@@ -102,6 +124,7 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
 
         return new
     }
+
 }
 
 fun Rect.debugDraw(g: PGraphics, accent: Boolean = false) {

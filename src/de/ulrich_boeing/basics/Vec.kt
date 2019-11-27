@@ -2,9 +2,10 @@ package de.ulrich_boeing.basics
 
 import kotlin.math.*
 import kotlin.random.Random
+
 // no cross product because it's only defined for 3 dimensional vectors
 
-class Vec(var x: Float, var y: Float) {
+open class Vec(var x: Float, var y: Float) {
     // empty constructor sometimes used for initializing a variable
     constructor() : this(0f, 0f)
 
@@ -23,16 +24,22 @@ class Vec(var x: Float, var y: Float) {
 
         fun fromPolar(angle: Float, length: Int): Vec =
             fromPolar(angle, length.toFloat())
+
         fun fromRandomAngle(): Vec =
             fromAngle(Random.nextFloat() * TAU)
-//        fun fromRandomPosition(width: Int, height: Int): Vec {
+
+        //        fun fromRandomPosition(width: Int, height: Int): Vec {
 //            val x = Random.floatInRange(0f, width.toFloat())
 //            val y = Random.floatInRange(0f, height.toFloat())
 //            return Vec(x, y)
 //        }
+        fun scalarProjection(vec: Vec, direction: Vec): Float {
+            val normDirection = Vec(direction).normalize()
+            return vec dot normDirection
+        }
     }
 
-    //    inline fun copy(): Vec = Vec(x, y)
+    //    fun copy(): Vec = Vec(x, y)
     fun set(x: Float, y: Float) {
         this.x = x
         this.y = y
@@ -43,10 +50,12 @@ class Vec(var x: Float, var y: Float) {
 
     operator fun plus(vec: Vec): Vec =
         Vec(x + vec.x, y + vec.y)
+
     operator fun plusAssign(vec: Vec) = set(x + vec.x, y + vec.y)
 
     operator fun minus(vec: Vec): Vec =
         Vec(x - vec.x, y - vec.y)
+
     operator fun minusAssign(vec: Vec) = set(x - vec.x, y - vec.y)
 
     operator fun times(n: Float): Vec = Vec(n * x, n * y)
@@ -126,6 +135,16 @@ class Vec(var x: Float, var y: Float) {
         return dx * dx + dy * dy
     }
 
+    fun distanceToLine(linePoint1: Vec, linePoint2: Vec): Float = sqrt(squareDistanceToLine(linePoint1, linePoint2))
+
+    fun squareDistanceToLine(linePoint1: Vec, linePoint2: Vec): Float {
+        val normLine = (linePoint1 to linePoint2).normalize()
+        val scalarProjection = (linePoint1 to this) dot normLine
+        val projection = linePoint1 + normLine * scalarProjection
+        return squareDistance(projection)
+    }
+
+    infix fun to(vec: Vec): Vec = Vec(vec.x - x, vec.y - y)
     infix fun dot(vec: Vec): Float = x * vec.x + y * vec.y
 
     override fun toString(): String {
@@ -138,7 +157,7 @@ class Vec(var x: Float, var y: Float) {
 
     fun lerp(vec: Vec, amount: Float): Vec = this + (vec - this) * amount
 
-    fun lerpArr(vec: Vec, count: Int): Array<Vec> = Array<Vec>(count, { i -> lerp(vec, (i.toFloat() / (count -1)))})
+    fun lerpArr(vec: Vec, count: Int): Array<Vec> = Array<Vec>(count, { i -> lerp(vec, (i.toFloat() / (count - 1))) })
 
     fun log(name: String = ""): String {
         val msg = StringBuilder()

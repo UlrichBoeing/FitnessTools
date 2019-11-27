@@ -15,13 +15,22 @@ open class Adaptable(val app: PApplet, val frame: Clipping) {
         get() {
             throw RuntimeException("Please implement property sizeDNA [example: override val sizeDNA = 8]")
         }
+    open val creaturesCount: Int = 1
+    var currentCreature = 0
+    val normCreaturesCount: Float
+            get() = (currentCreature - 1) / (creaturesCount -1).toFloat()
+
+    val sizeFlockDNA: Int
+        get() = sizeDNA * creaturesCount
+
     protected lateinit var population: Array<DNA>
     lateinit var fitness: FloatArray
     lateinit var optimizedFitness: FloatArray
 
-    var mutationRate = 0.04f
-    var mutationRange = 0.1f
+    var mutationRate = 0.01f
+    var mutationRange = 0.9f
     var eliteRate = 0.1f
+
 
     val stats = AdaptableStats()
 
@@ -33,7 +42,7 @@ open class Adaptable(val app: PApplet, val frame: Clipping) {
             fitness = FloatArray(value)
         }
 
-    private fun initDNA(): DNA = FloatArray(sizeDNA) { Random.nextFloat() }
+    private fun initDNA(): DNA = FloatArray(sizeFlockDNA) { Random.nextFloat() }
     private fun initPopulation(count: Int): Array<DNA> = Array(count) { initDNA() }
 
     fun getBestFitness(): Int = fitness.indexOfMax()
@@ -54,7 +63,8 @@ open class Adaptable(val app: PApplet, val frame: Clipping) {
     private fun createCrossoverDNA(): DNA {
         val i1 = optimizedFitness.selectOne()
         val i2 = optimizedFitness.selectOne()
-        val crossoverDNA = population[i1].mix(population[i2], Random.nextInt(1, sizeDNA - 2))
+        // TODO: -2
+        val crossoverDNA = population[i1].mix(population[i2], Random.nextInt(1, sizeFlockDNA - 1))
         return mutate(crossoverDNA)
     }
 
@@ -66,6 +76,9 @@ open class Adaptable(val app: PApplet, val frame: Clipping) {
     fun optimizeFitness() {
         optimizedFitness = fitness.copyOf()
         optimizedFitness.norm()
+        for (i in optimizedFitness.indices) {
+            optimizedFitness[i] *= optimizedFitness[i]
+        }
     }
 
     fun createPopulation(): Array<DNA> {
@@ -86,12 +99,12 @@ open class Adaptable(val app: PApplet, val frame: Clipping) {
             val image = encloseDraw(population[i], scale)
             // TODO: image muss gleiche Grösse wie target haben, andere getDifference Methode wählen, alle Pixel summieren?
             val dif = target.getDifference(image)
-            val colorValuesCount = image.width * image.height * 3 * 255
+            val colorValuesCount = 3 * 255
             fitness[i] = 1 - (dif / colorValuesCount.toFloat())
         }
     }
 
-    fun sssgetImage(index: Int = 0, scale: Float = 1f): PImage {
+    fun getImage(index: Int = 0, scale: Float = 1f): PImage {
         return encloseDraw(population[index], scale).copy()
     }
 
@@ -100,12 +113,18 @@ open class Adaptable(val app: PApplet, val frame: Clipping) {
         val height = (frame.height * scale).roundToInt()
         val g = app.createGraphics(width, height)
         g.beginDraw()
-        draw(dna, g)
+        g.background(0)
+        for (i in 0 until creaturesCount) {
+            currentCreature = i + 1
+            val creatureDNA = dna.copyOfRange(i * sizeDNA, (i+1) * sizeDNA)
+            draw(creatureDNA, g)
+        }
+        currentCreature = 0
         g.endDraw()
         return g
     }
 
-    open fun draw(dna: DNA, g: PGraphics) {
+    open fun draw(dna: DNA,  g: PGraphics) {
         throw RuntimeException("Please implement function draw()")
     }
 

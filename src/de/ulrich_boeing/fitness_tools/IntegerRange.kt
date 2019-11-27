@@ -5,7 +5,7 @@ import kotlin.random.Random
 import kotlin.math.min
 import kotlin.math.max
 
-class IntRange(val start: Int, val end: Int) {
+class IntegerRange(val start: Int, val end: Int = start) {
     val min = min(start, end)
     val max = max(start, end)
 
@@ -19,6 +19,9 @@ class IntRange(val start: Int, val end: Int) {
         val value = (1 - range) * value + range * random()
         return check(value.roundToInt())
     }
+
+    fun expand(value: Float): Int = start + (value * (end - start)).roundToInt()
+
 
     fun check(value: Int): Int {
         return when {
