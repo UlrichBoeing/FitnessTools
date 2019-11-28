@@ -1,79 +1,86 @@
 package de.ulrich_boeing.processing
 
 import de.ulrich_boeing.basics.Clipping
-import de.ulrich_boeing.basics.Rect
+import de.ulrich_boeing.extensions.getPixel
 import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
-import java.util.*
-import kotlin.math.roundToInt
-enum class Images {
-    ORIGINAL, PREVIEW
-}
-
-class SourceImage(val app: PApplet) {
-    val countImages = 2
-    val images = Array<PImage?>(countImages) { null }
-    val size = Array<Clipping>(countImages) { Clipping() }
-
-    lateinit var image: PImage
-    lateinit var preview : PImage
-
-    var previewSize=  Clipping()
-    var imageSize = Clipping()
-
-    var path = ""
-    var curIndex = -1
-
-    val ORIGINAL = 0
-    val PREVIEW = 1
 
 
-    inline var pixel: Int
-        get() = image.pixels[curIndex]
+class SourceImage(val app: PApplet, val path: String) {
+    enum class Type {
+        ORIGINAL, PREVIEW
+    }
+
+    private var image = Array<PImage?>(Type.values().size) { null }
+    private val clipping = Array<Clipping>(Type.values().size) { Clipping() }
+    var previewArea: Clipping = Clipping(0, 0, app.width, app.height)
         set(value) {
-            image.pixels[curIndex] = value
+            field = value
+            image[Type.PREVIEW.ordinal] = null
+            image(SourceImage.Type.PREVIEW)
         }
 
-//    inline operator fun get(x: Int, y: Int): Int =
-//        preview.pixels[x + y * preview.width]
-//
+    val previewClipping : Clipping
+        get() = clipping[Type.PREVIEW.ordinal]
 
-    fun load(path: String) {
-        this.path = path
-        image = app.loadImage(path)
 
-        val img =  app.loadImage(path)
-        images[ORIGINAL] = img
+    var curType = Type.ORIGINAL
 
-        imageSize = Clipping(0, 0, img.width, img.height)
-        image.loadPixels()
+    /*
+        Expecting coordinates in from 0 -> preview.width, 0 -> preview.height
+     */
+    operator fun get(x: Float, y: Float, type : Type = curType): Int {
+        return if (curType == Type.PREVIEW) {
+            image(curType).getPixel(x, y)
+        } else {
+            val xFloat = x * clipping[curType.ordinal].width / clipping[Type.PREVIEW.ordinal].width
+            val yFloat = y * clipping[curType.ordinal].height / clipping[Type.PREVIEW.ordinal].height
+            image(curType).getPixel(xFloat, yFloat)
+        }
+    }
+
+    fun image(type: Type): PImage {
+        val number = type.ordinal
+
+        if (image[number] != null) {
+            return image[number]!!
+        }
+
+        lateinit var img: PImage
+        when (type) {
+            Type.ORIGINAL -> {
+                img = app.loadImage(path)
+                clipping[number] = Clipping(0, 0, img.width, img.height)
+            }
+            Type.PREVIEW -> {
+                img = image(Type.ORIGINAL).copy()
+                clipping[number] = previewArea.center(previewArea.shrinkInto(clipping[Type.ORIGINAL.ordinal]))
+                img.resize(clipping[number].width, clipping[number].height)
+            }
+        }
+
+        image[number] = img
         img.loadPixels()
+        return img
     }
 
-    fun show(g: PGraphics, previewArea: Clipping) {
-        if (previewSize.size == 0) {
-            previewSize = previewArea.shrinkInto(imageSize)
-            previewSize = previewArea.center(previewSize)
-            preview = image.copy()
-            preview.resize(previewSize.width, previewSize.height)
-            preview.resize(previewSize.width / 20, previewSize.height / 20)
-            preview.resize(previewSize.width, previewSize.height)
-        }
+//    fun load(path: String): PImage {
+//        this.path = path
+//        return image(Type.ORIGINAL)
+//    }
+
+    fun show(g: PGraphics, alpha : Int = 72) {
+        val preview = image(Type.PREVIEW)
+        val previewSize = clipping[Type.PREVIEW.ordinal]
+        previewSize.draw(g)
+        g.tint(255f, alpha.toFloat())
         g.image(preview, previewSize.x.toFloat(), previewSize.y.toFloat())
+        g.noTint()
     }
 
-    // Is expecting image-coordinates
-    private fun getIndex(x: Int, y: Int): Int {
-        if (x < 0 || y < 0 || x >= image.width || y >= image.height) {
-            curIndex = -1
-            return curIndex
-        }
-        curIndex = x + y * image.width
-        return curIndex
-    }
+    // Is expecting preview-coordinates
+    fun isOutside(x: Float, y: Float): Boolean =
+        (x < 0 || y < 0 || x >= image(Type.PREVIEW).width || y >= image(Type.PREVIEW).height)
 
-    fun getIndex(x: Float, y: Float): Int {
-        return getIndex(x.roundToInt(), y.roundToInt())
-    }
 }
