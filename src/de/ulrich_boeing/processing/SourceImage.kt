@@ -5,82 +5,47 @@ import de.ulrich_boeing.extensions.getPixel
 import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
+import kotlin.math.roundToInt
 
+class SourceImage {
+    val image: PImage
+    val imageClip: Clipping
+    var previewImage: PImage? = null
+    val previewClip: Clipping
 
-class SourceImage(val app: PApplet, val path: String) {
-    enum class Type {
-        ORIGINAL, PREVIEW
+    constructor(app: PApplet, path: String, previewArea: Clipping) {
+        this.image = app.loadImage(path)
+        this.imageClip = Clipping(image.width, image.height)
+        this.previewClip = imageClip.shrinkInto(previewArea).centerInto(previewArea)
+        this.image.loadPixels()
     }
 
-    private var image = Array<PImage?>(Type.values().size) { null }
-    private val clipping = Array<Clipping>(Type.values().size) { Clipping() }
-    var previewArea: Clipping = Clipping(0, 0, app.width, app.height)
-        set(value) {
-            field = value
-            image[Type.PREVIEW.ordinal] = null
-            image(SourceImage.Type.PREVIEW)
-        }
-
-    val previewClipping : Clipping
-        get() = clipping[Type.PREVIEW.ordinal]
-
-
-    var curType = Type.ORIGINAL
-
-    /*
-        Expecting coordinates in from 0 -> preview.width, 0 -> preview.height
-     */
-    operator fun get(x: Float, y: Float, type : Type = curType): Int {
-        return if (curType == Type.PREVIEW) {
-            image(curType).getPixel(x, y)
-        } else {
-            val xFloat = x * clipping[curType.ordinal].width / clipping[Type.PREVIEW.ordinal].width
-            val yFloat = y * clipping[curType.ordinal].height / clipping[Type.PREVIEW.ordinal].height
-            image(curType).getPixel(xFloat, yFloat)
-        }
-    }
-
-    fun image(type: Type): PImage {
-        val number = type.ordinal
-
-        if (image[number] != null) {
-            return image[number]!!
-        }
-
-        lateinit var img: PImage
-        when (type) {
-            Type.ORIGINAL -> {
-                img = app.loadImage(path)
-                clipping[number] = Clipping(0, 0, img.width, img.height)
-            }
-            Type.PREVIEW -> {
-                img = image(Type.ORIGINAL).copy()
-                clipping[number] = previewArea.center(previewArea.shrinkInto(clipping[Type.ORIGINAL.ordinal]))
-                img.resize(clipping[number].width, clipping[number].height)
-            }
-        }
-
-        image[number] = img
-        img.loadPixels()
-        return img
-    }
-
-//    fun load(path: String): PImage {
-//        this.path = path
-//        return image(Type.ORIGINAL)
-//    }
-
-    fun show(g: PGraphics, alpha : Int = 72) {
-        val preview = image(Type.PREVIEW)
-        val previewSize = clipping[Type.PREVIEW.ordinal]
-        previewSize.draw(g)
-        g.tint(255f, alpha.toFloat())
-        g.image(preview, previewSize.x.toFloat(), previewSize.y.toFloat())
-        g.noTint()
+    operator fun get(x: Float, y: Float): Int {
+        val normX = x  / previewClip.width
+        val normY = y / previewClip.height
+        val newX = (normX * imageClip.width).roundToInt()
+        val newY = (normY * imageClip.height).roundToInt()
+        return image.getPixel(newX, newY)
     }
 
     // Is expecting preview-coordinates
-    fun isOutside(x: Float, y: Float): Boolean =
-        (x < 0 || y < 0 || x >= image(Type.PREVIEW).width || y >= image(Type.PREVIEW).height)
+    fun contains(x: Int, y: Int): Boolean =
+        !(x < previewClip.x || y < previewClip.y || x > previewClip.right || y >= previewClip.bottom)
 
+
+    fun showPreview(g: PGraphics, alpha: Int = 72) {
+        if (previewImage == null) {
+            previewImage = createPreviewImage()
+            println("preview is created")
+        }
+        g.tint(255f, alpha.toFloat())
+        g.image(previewImage!!, previewClip.x.toFloat(), previewClip.y.toFloat())
+        g.noTint()
+    }
+
+    fun createPreviewImage(): PImage {
+        val img = image.copy()
+        img.resize(previewClip.width, previewClip.height)
+        return img
+    }
 }

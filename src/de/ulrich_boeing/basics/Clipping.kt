@@ -13,6 +13,7 @@ import kotlin.math.*
  */
 class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
     constructor () : this(Int.MIN_VALUE, Int.MIN_VALUE, 0, 0)
+    constructor(width: Int, height: Int) : this(0, 0, width, height)
     constructor(x: Float, y: Float, width: Float, height: Float) : this(
         x.roundToInt(),
         y.roundToInt(),
@@ -111,20 +112,20 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
         return numberVertices
     }
 
-    fun center(other: Clipping): Clipping {
-        val newX = x + (width - other.width) / 2
-        val newY = y + (height - other.height) / 2
-        return Clipping(newX, newY, other.width, other.height)
+    fun centerInto(other: Clipping): Clipping {
+        val newX = other.x + (other.width - width) / 2
+        val newY = other.y + (other.height - height) / 2
+        return Clipping(newX, newY, width, height)
     }
 
-    // clipping other will be changed
+    // this clipping will be changed in size according to other
     fun shrinkInto(other: Clipping): Clipping {
-        if (other.aspectRatio > aspectRatio) {
-            val newHeight = (other.height.toFloat() * width/ other.width).roundToInt()
-            return Clipping(x, y, width, newHeight)
+        if (aspectRatio > other.aspectRatio) {
+            val newHeight = (height.toFloat() * other.width/ width).roundToInt()
+            return Clipping(other.x, other.y, other.width, newHeight)
         } else {
-            val newWidth = (other.width.toFloat() * height / other.height).roundToInt()
-            return Clipping(x, y, newWidth, height)
+            val newWidth = (width.toFloat() * other.height / height).roundToInt()
+            return Clipping(other.x, other.y, newWidth, other.height)
         }
     }
 

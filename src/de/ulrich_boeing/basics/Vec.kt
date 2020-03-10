@@ -1,5 +1,6 @@
 package de.ulrich_boeing.basics
 
+import processing.core.PGraphics
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -144,6 +145,17 @@ open class Vec(var x: Float, var y: Float) {
         return squareDistance(projection)
     }
 
+    /**
+     * Returns a new vector with a random position inside a circle around the given vector
+     * @param radius The radius of the circle around the old vector
+     */
+    fun shiftInCircle(radius: Float): Vec {
+        val angle = Vec.fromRandomAngle()
+        val shift =  angle * (radius * Random.nextFloat())
+        return this + shift
+    }
+
+
     infix fun to(vec: Vec): Vec = Vec(vec.x - x, vec.y - y)
     infix fun dot(vec: Vec): Float = x * vec.x + y * vec.y
 
@@ -158,6 +170,8 @@ open class Vec(var x: Float, var y: Float) {
     fun lerp(vec: Vec, amount: Float): Vec = this + (vec - this) * amount
 
     fun lerpArr(vec: Vec, count: Int): Array<Vec> = Array<Vec>(count, { i -> lerp(vec, (i.toFloat() / (count - 1))) })
+
+//    fun tweenPoints(end: Vec, count: Int): Array<Vec> = Array(count) {i -> }
 
     fun log(name: String = ""): String {
         val msg = StringBuilder()
@@ -224,5 +238,9 @@ fun String.padIndexOf(char: Char, length: Int, padChar: Char = ' ', excludeChar:
 
 fun Float.toDegrees(): Float = this * 360f / Vec.TAU
 fun Float.toRadians(): Float = this * Vec.TAU / 360f
+
+fun Vec.drawAsCircle(g: PGraphics, radius : Float = 8f) {
+    g.ellipse(x, y, radius, radius)
+}
 
 
