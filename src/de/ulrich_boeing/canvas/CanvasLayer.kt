@@ -39,16 +39,20 @@ class CanvasLayer(val app: PApplet, val width: Int, val height: Int) {
         }
     }
 
+    fun getColor(x: Float, y: Float): Int {
+        return layers[0]!!.canvas[CanvasSize.S]!!.getColor(x, y)
+    }
+
     fun addLayer(index: Int, image: PImage? = null): SizeableCanvas {
         if (layers.containsKey(index))
             throw RuntimeException("Cannot add layer with already existing index $index")
 
-        if (image != null) {
-            addImageSizeToSizes(image)
-        }
+//        if (image != null) {
+//            addImageSizeToSizes(image)
+//        }
         val newLayer = SizeableCanvas(this, sizes, image)
 
-        sizes.remove(CanvasSize.IMAGE)
+//        sizes.remove(CanvasSize.IMAGE)
 
         layers[index] = newLayer
         return newLayer
@@ -78,7 +82,8 @@ class CanvasLayer(val app: PApplet, val width: Int, val height: Int) {
         for ((index, layer) in layers) {
             val singleCanvas = layer.canvas[size]
             if (singleCanvas != null) {
-                singleCanvas. g.save("E:/Temp/processing/" + name + " " + size.toString() + index.toString() + ".png")
+                println("save layer $index with size ${singleCanvas.size}")
+                singleCanvas.save("E:/Temp/processing/" + name + " " + size.toString() + index.toString() + ".png")
             }
         }
     }
@@ -95,9 +100,9 @@ class CanvasLayer(val app: PApplet, val width: Int, val height: Int) {
         return false
     }
 
-    fun addImageSizeToSizes(image: PImage) {
-        sizes[CanvasSize.IMAGE] = getSizeFactorOfImage(image)
-    }
+//    fun addImageSizeToSizes(image: PImage) {
+//        sizes[CanvasSize.IMAGE] = getSizeFactorOfImage(image)
+//    }
 
     fun getSizeFactorOfImage(image: PImage): Float {
         val areaOfCanvas = (width * height).toFloat()

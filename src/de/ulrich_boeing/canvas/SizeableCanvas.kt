@@ -6,10 +6,10 @@ import processing.core.PGraphics
 import processing.core.PImage
 
 enum class CanvasSize {
-    PREVIEW, S, M, L, OUTPUT, IMAGE
+    PREVIEW, S, M, L, OUTPUT
 }
 
-class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Float>, image: PImage?) {
+class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Float>, val image: PImage?) {
     val list = mutableListOf<Drawable>()
     var canvas: MutableMap<CanvasSize, SingleCanvas> = mutableMapOf()
     var blendMode = PApplet.BLEND
@@ -26,7 +26,7 @@ class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Float>, ima
     init {
         // create different sizes
         for ((canvasSize, size) in sizes) {
-            canvas[canvasSize] = SingleCanvas(this, size, image)
+            canvas[canvasSize] = SingleCanvas(this, size)
         }
     }
 

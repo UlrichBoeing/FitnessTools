@@ -7,19 +7,11 @@ import processing.core.PImage
 import java.lang.RuntimeException
 import kotlin.math.roundToInt
 
-class SingleCanvas(val parent: SizeableCanvas, val size: Float, image: PImage?) {
+class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
     val width = (parent.width * size).roundToInt()
     val height = (parent.height * size).roundToInt()
-    val g: PGraphics by lazy { createGraphics(parent.app, width, height) }
+    private val g: PGraphics by lazy { createGraphics(parent.app, width, height, parent.image) }
     var drawnElements = 0
-
-    init {
-        if (parent.hasImage) {
-            g.beginDraw()
-            g.image(image, 0f, 0f, g.width.toFloat(), g.height.toFloat())
-            g.endDraw()
-        }
-    }
 
     fun drawGraphics(target: PGraphics) {
         if (parent.hasImage || drawnElements > 0) {
@@ -29,6 +21,16 @@ class SingleCanvas(val parent: SizeableCanvas, val size: Float, image: PImage?) 
             target.blendMode(parent.blendMode)
             target.image(g, 0f, 0f)
         }
+    }
+
+    fun getColor(x: Float, y: Float): Int {
+        val xInt = (x * size).roundToInt()
+        val yInt = (y * size).roundToInt()
+        val index = xInt + yInt * g.width
+        g.loadPixels()
+        val c = g.pixels[index]
+        g.updatePixels()
+        return c
     }
 
     fun drawNextElement(): Boolean {
@@ -44,9 +46,21 @@ class SingleCanvas(val parent: SizeableCanvas, val size: Float, image: PImage?) 
         return true
     }
 
-    fun createGraphics(app: PApplet, width: Int, height: Int): PGraphics {
-        println("PGraphics wird erstellt: width = $width, height = $height")
-        return app.createGraphics(width, height)
+    fun save(path: String) {
+        if (parent.hasImage || drawnElements > 0)
+            g.save(path)
     }
+
 }
 
+fun createGraphics(app: PApplet, width: Int, height: Int, image: PImage?): PGraphics {
+    println("PGraphics wird erstellt: width = $width, height = $height")
+    val localG = app.createGraphics(width, height)
+
+    if (image != null) {
+        localG.beginDraw()
+        localG.image(image, 0f, 0f, localG.width.toFloat(), localG.height.toFloat())
+        localG.endDraw()
+    }
+    return localG
+}
