@@ -10,7 +10,12 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 
-class CanvasLayer(val app: PApplet, val width: Int, val height: Int) {
+class CanvasLayer(
+    val app: PApplet,
+    val width: Int,
+    val height: Int,
+    val sizes : Map<CanvasSize, Float> = mapOf(CanvasSize.PREVIEW to 0.8f, CanvasSize.OUTPUT to 8f)
+) {
     companion object {
         fun createFromImage(app: PApplet, path: String): CanvasLayer {
             val standardSize = 1000000f
@@ -18,47 +23,58 @@ class CanvasLayer(val app: PApplet, val width: Int, val height: Int) {
             val width = sqrt(standardSize * image.width / image.height)
             val height = sqrt(standardSize * image.height / image.width)
             val canvasLayer = CanvasLayer(app, width.roundToInt(), height.roundToInt())
-            canvasLayer.addLayer(0, image)
+            canvasLayer.addImageLayer(0, image)
             canvasLayer.name = path.fileNameFromPath()
             return canvasLayer
         }
     }
-    val layers: MutableMap<Int, SizeableCanvas> = mutableMapOf()
-    val sizes: MutableMap<CanvasSize, Float> = mutableMapOf(CanvasSize.S to 0.8f, CanvasSize.OUTPUT to 1f)
-    var name: String = ""
 
-    fun add(index: Int, drawable: Drawable) {
-        if (layers.containsKey(index)) {
-            layers[index]!!.add(drawable)
-        }
+    private var layers: MutableMap<Int, SizeableCanvas> = mutableMapOf()
+    private var curLayer : SizeableCanvas
+    private var curReadLayer : SizeableCanvas
+    var name: String = ""
+    init {
+        curLayer = SizeableCanvas(this, sizes, null)
+        layers[1] = curLayer
+        curReadLayer = curLayer
     }
 
-    fun setBlendMode(blendMode: Int, index: Int) {
-        if (layers.containsKey(index)) {
-            layers[index]!!.blendMode = blendMode
-        }
+    fun add(drawable: Drawable) {
+        curLayer.add(drawable)
+    }
+
+    fun setBlendMode(blendMode: Int) {
+        curLayer.blendMode = blendMode
     }
 
     fun getColor(x: Float, y: Float): Int {
-        return layers[0]!!.canvas[CanvasSize.S]!!.getColor(x, y)
+        return curReadLayer.canvas[CanvasSize.PREVIEW]!!.getColor(x, y)
     }
 
-    fun addLayer(index: Int, image: PImage? = null): SizeableCanvas {
+
+    fun setCurLayer(index: Int) {
+        val layer = layers[index]
+        if (layer != null) {
+            curLayer = layer
+        } else {
+            curLayer = SizeableCanvas(this, sizes, null)
+            layers[index] = curLayer
+            layers = layers.toSortedMap()
+        }
+    }
+
+    fun addImageLayer(index: Int, image: PImage): Int {
         if (layers.containsKey(index))
-            throw RuntimeException("Cannot add layer with already existing index $index")
+            throw RuntimeException("Cannot add image-layer to already existing index $index")
 
-//        if (image != null) {
-//            addImageSizeToSizes(image)
-//        }
-        val newLayer = SizeableCanvas(this, sizes, image)
+        curReadLayer = SizeableCanvas(this, sizes, image)
+        layers[index] = curReadLayer
+        layers = layers.toSortedMap()
 
-//        sizes.remove(CanvasSize.IMAGE)
-
-        layers[index] = newLayer
-        return newLayer
+        return index
     }
 
-    fun getImage(size: CanvasSize): PGraphics? {
+    fun getImage(size: CanvasSize = CanvasSize.PREVIEW): PGraphics? {
         val sizeFactor = sizes[size] ?: 0f
         if (sizeFactor <= 0) {
             return null
@@ -104,12 +120,12 @@ class CanvasLayer(val app: PApplet, val width: Int, val height: Int) {
 //        sizes[CanvasSize.IMAGE] = getSizeFactorOfImage(image)
 //    }
 
-    fun getSizeFactorOfImage(image: PImage): Float {
-        val areaOfCanvas = (width * height).toFloat()
-        val areaOfImage = (image.width * image.height).toFloat()
-        val factor = sqrt(areaOfImage / areaOfCanvas)
-        return factor
-    }
+//    fun getSizeFactorOfImage(image: PImage): Float {
+//        val areaOfCanvas = (width * height).toFloat()
+//        val areaOfImage = (image.width * image.height).toFloat()
+//        val factor = sqrt(areaOfImage / areaOfCanvas)
+//        return factor
+//    }
 
 //    fun getCurrentNumber(): Int {
 //        val folder = File(folderName)
