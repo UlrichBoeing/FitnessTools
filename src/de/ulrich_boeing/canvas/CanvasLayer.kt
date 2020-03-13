@@ -1,11 +1,12 @@
 package de.ulrich_boeing.canvas
 
+import de.ulrich_boeing.basics.Timing
+import de.ulrich_boeing.basics.Vec
 import de.ulrich_boeing.extensions.fileNameFromPath
 import de.ulrich_boeing.framework.Drawable
 import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
-import java.io.File
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -14,7 +15,8 @@ class CanvasLayer(
     val app: PApplet,
     val width: Int,
     val height: Int,
-    val sizes : Map<CanvasSize, Float> = mapOf(CanvasSize.PREVIEW to 0.8f, CanvasSize.OUTPUT to 8f)
+    val sizes: Map<CanvasSize, Float> = mapOf(CanvasSize.PREVIEW to 0.8f, CanvasSize.OUTPUT to 8f)
+
 ) {
     companion object {
         fun createFromImage(app: PApplet, path: String): CanvasLayer {
@@ -30,27 +32,39 @@ class CanvasLayer(
     }
 
     private var layers: MutableMap<Int, SizeableCanvas> = mutableMapOf()
-    private var curLayer : SizeableCanvas
-    private var curReadLayer : SizeableCanvas
+    private var curLayer = SizeableCanvas(this, sizes, null)
+    private var curReadIndex: Int = 1
+    private var lastFrameAdded = -1
     var name: String = ""
+
     init {
-        curLayer = SizeableCanvas(this, sizes, null)
         layers[1] = curLayer
-        curReadLayer = curLayer
     }
 
     fun add(drawable: Drawable) {
         curLayer.add(drawable)
+        lastFrameAdded = app.frameCount
     }
 
     fun setBlendMode(blendMode: Int) {
         curLayer.blendMode = blendMode
     }
 
-    fun getColor(x: Float, y: Float): Int {
-        return curReadLayer.canvas[CanvasSize.PREVIEW]!!.getColor(x, y)
+    fun getColor(vec: Vec, index: Int = curReadIndex): Int = getColor(vec.x, vec.y, index)
+    fun getColor(x: Float, y: Float, index: Int = curReadIndex): Int {
+        val readLayer = layers[index]
+        if (readLayer != null) {
+            return readLayer.canvas[CanvasSize.PREVIEW]!!.getColor(x, y)
+        } else {
+            throw RuntimeException("Cannot read color value, canvas does not exist.")
+        }
     }
 
+    fun previewToStd(vec: Vec): Vec {
+        vec.x /= sizes[CanvasSize.PREVIEW]!!
+        vec.y /= sizes[CanvasSize.PREVIEW]!!
+        return vec
+    }
 
     fun setCurLayer(index: Int) {
         val layer = layers[index]
@@ -67,8 +81,8 @@ class CanvasLayer(
         if (layers.containsKey(index))
             throw RuntimeException("Cannot add image-layer to already existing index $index")
 
-        curReadLayer = SizeableCanvas(this, sizes, image)
-        layers[index] = curReadLayer
+        layers[index] = SizeableCanvas(this, sizes, image)
+        curReadIndex = index
         layers = layers.toSortedMap()
 
         return index
@@ -104,17 +118,45 @@ class CanvasLayer(
         }
     }
 
-    fun drawNextElement(): Boolean {
+    /**
+     *
+     */
+    fun isRenderingComplete(size: CanvasSize): Boolean {
+        for ((_, canvas: SizeableCanvas) in layers) {
+            if (!canvas.isRenderingComplete(size))
+                return false
+        }
+        return true
+    }
+
+    /**
+     * Rendering of Drawables until a certain amount of time is reached
+     * (default rate is 60fps, ~17ms for each draw())
+     * renderDuration
+     */
+    fun renderNextElements(): Boolean {
+        val renderDuration = 20L
+        val timing = Timing()
+
         for (size in CanvasSize.values()) {
-            for ((index, canvas) in layers) {
-                if (canvas.drawNextElement(size)) {
-                    println(size.toString())
+            if (!appIsIdle() && size != CanvasSize.PREVIEW)
+                return false
+            for ((_, canvas) in layers) {
+                if (canvas.renderNextElement(size)) {
+//                    timing.print("render one element in $size")
+//                    if (timing.get() > renderDuration)
                     return true
                 }
             }
         }
         return false
     }
+
+    fun contains(x: Float, y: Float): Boolean =
+        !(x < 0 || y < 0 || x > width || y > height)
+
+    fun appIsIdle(): Boolean = !(app.mousePressed || app.keyPressed || lastFrameAdded > app.frameCount - 4)
+
 
 //    fun addImageSizeToSizes(image: PImage) {
 //        sizes[CanvasSize.IMAGE] = getSizeFactorOfImage(image)

@@ -11,7 +11,7 @@ enum class CanvasSize {
 
 class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Float>, val image: PImage?) {
     val list = mutableListOf<Drawable>()
-    var canvas: MutableMap<CanvasSize, SingleCanvas> = mutableMapOf()
+    val canvas: MutableMap<CanvasSize, SingleCanvas> = mutableMapOf()
     var blendMode = PApplet.BLEND
     val hasImage = (image != null)
     val readOnly = hasImage
@@ -42,5 +42,7 @@ class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Float>, val
         }
     }
 
-    fun drawNextElement(size: CanvasSize): Boolean = canvas[size]?.drawNextElement() ?: false
+    fun isRenderingComplete(size: CanvasSize): Boolean = canvas[size]?.isRenderingComplete() ?: true
+
+    fun renderNextElement(size: CanvasSize): Boolean = canvas[size]?.renderNextElement() ?: false
 }

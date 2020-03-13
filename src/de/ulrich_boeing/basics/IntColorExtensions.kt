@@ -79,6 +79,10 @@ fun Int.getHSBDiff(other: Int): FloatArray {
     return FloatArray(3) {i -> (hsb1[i] - hsb2[i]).absoluteValue}
 }
 
+fun Int.printAsColor() {
+    println("red=" + this.red + " green=" + this.green + " blue=" + this.blue + " alpha=" + this.alpha)
+}
+
 fun FloatArray.weightedAverage(weight: FloatArray): Float {
     var sum = 0f
     for (i in this.indices) {

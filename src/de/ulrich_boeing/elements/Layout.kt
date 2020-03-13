@@ -192,7 +192,7 @@ class Layout(app: PApplet, image: PImage) {
 //    }
 
     private fun draw(g: PGraphics) {
-        timing.start()
+        val timing = Timing()
         g.beginDraw()
 //        g.blendMode(PApplet.ADD)
         g.background(0)

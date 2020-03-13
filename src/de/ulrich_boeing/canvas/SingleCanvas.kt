@@ -24,8 +24,8 @@ class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
     }
 
     fun getColor(x: Float, y: Float): Int {
-        val xInt = (x * size).roundToInt()
-        val yInt = (y * size).roundToInt()
+        val xInt = (x * size).toInt()
+        val yInt = (y * size).toInt()
         val index = xInt + yInt * g.width
         g.loadPixels()
         val c = g.pixels[index]
@@ -33,8 +33,10 @@ class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
         return c
     }
 
-    fun drawNextElement(): Boolean {
-        if (drawnElements == parent.list.size) {
+    fun isRenderingComplete(): Boolean = (drawnElements >= parent.list.size)
+
+    fun renderNextElement(): Boolean {
+        if (isRenderingComplete()) {
             return false
         }
         val drawable = parent.list[drawnElements++]
