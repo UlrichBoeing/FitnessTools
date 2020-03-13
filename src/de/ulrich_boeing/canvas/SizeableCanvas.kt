@@ -1,6 +1,7 @@
 package de.ulrich_boeing.canvas
 
 import de.ulrich_boeing.framework.Drawable
+import org.tinylog.kotlin.Logger
 import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
@@ -31,8 +32,10 @@ class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Float>, val
     }
 
     fun add(drawable: Drawable) {
-        if (!readOnly)
+        if (!readOnly) {
             list.add(drawable)
+            Logger.info("Element ${list.lastIndex} added to list.")
+        }
     }
 
     fun drawGraphics(target: PGraphics, size: CanvasSize) {

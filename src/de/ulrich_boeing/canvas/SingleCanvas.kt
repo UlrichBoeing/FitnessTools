@@ -5,6 +5,7 @@ import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
 import java.lang.RuntimeException
+import org.tinylog.kotlin.Logger
 import kotlin.math.roundToInt
 
 class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
@@ -37,8 +38,10 @@ class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
 
     fun renderNextElement(): Boolean {
         if (isRenderingComplete()) {
+            Logger.info("Render is full")
             return false
         }
+        Logger.info("Draw element $drawnElements in size ${size.toString()}")
         val drawable = parent.list[drawnElements++]
 
         g.beginDraw()

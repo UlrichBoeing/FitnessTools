@@ -9,6 +9,7 @@ import processing.core.PGraphics
 import processing.core.PImage
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
+import org.tinylog.kotlin.Logger
 
 
 class CanvasLayer(
@@ -129,22 +130,28 @@ class CanvasLayer(
         return true
     }
 
+    fun render() {
+        val renderDuration = 20L
+        val timing = Timing()
+        val sizeLimit = if (appIsIdle()) CanvasSize.OUTPUT else CanvasSize.PREVIEW
+        Logger.info("Current sizeLimit = ${sizeLimit.name}")
+        while (timing.get() < renderDuration) {
+            if (!renderNextElement(sizeLimit))
+                return
+        }
+    }
+
     /**
      * Rendering of Drawables until a certain amount of time is reached
      * (default rate is 60fps, ~17ms for each draw())
      * renderDuration
      */
-    fun renderNextElements(): Boolean {
-        val renderDuration = 20L
-        val timing = Timing()
-
+    fun renderNextElement(sizeLimit: CanvasSize): Boolean {
         for (size in CanvasSize.values()) {
-            if (!appIsIdle() && size != CanvasSize.PREVIEW)
+            if (size > sizeLimit)
                 return false
             for ((_, canvas) in layers) {
                 if (canvas.renderNextElement(size)) {
-//                    timing.print("render one element in $size")
-//                    if (timing.get() > renderDuration)
                     return true
                 }
             }
