@@ -10,7 +10,7 @@ enum class CanvasSize {
     PREVIEW, S, M, L, OUTPUT
 }
 
-class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Float>, val image: PImage?) {
+internal class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Float>, val image: PImage?) {
     val list = mutableListOf<Drawable>()
     val canvas: MutableMap<CanvasSize, SingleCanvas> = mutableMapOf()
     var blendMode = PApplet.BLEND

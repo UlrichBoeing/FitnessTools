@@ -8,7 +8,7 @@ import java.lang.RuntimeException
 import org.tinylog.kotlin.Logger
 import kotlin.math.roundToInt
 
-class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
+internal class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
     val width = (parent.width * size).roundToInt()
     val height = (parent.height * size).roundToInt()
     private val g: PGraphics by lazy { createGraphics(parent.app, width, height, parent.image) }
@@ -38,7 +38,7 @@ class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
 
     fun renderNextElement(): Boolean {
         if (isRenderingComplete()) {
-            Logger.info("Render is full")
+//            Logger.info("Render is already complete")
             return false
         }
         Logger.info("Draw element $drawnElements in size ${size.toString()}")

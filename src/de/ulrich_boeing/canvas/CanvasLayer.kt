@@ -16,7 +16,7 @@ class CanvasLayer(
     val app: PApplet,
     val width: Int,
     val height: Int,
-    val sizes: Map<CanvasSize, Float> = mapOf(CanvasSize.PREVIEW to 0.8f, CanvasSize.OUTPUT to 8f)
+    val sizes: Map<CanvasSize, Float> = mapOf(CanvasSize.PREVIEW to 0.8f, CanvasSize.OUTPUT to 5f)
 
 ) {
     companion object {
@@ -62,8 +62,8 @@ class CanvasLayer(
     }
 
     fun previewToStd(vec: Vec): Vec {
-        vec.x /= sizes[CanvasSize.PREVIEW]!!
-        vec.y /= sizes[CanvasSize.PREVIEW]!!
+        vec.x /= sizes.getValue(CanvasSize.PREVIEW)
+        vec.y /= sizes.getValue(CanvasSize.PREVIEW)
         return vec
     }
 
@@ -112,9 +112,10 @@ class CanvasLayer(
     fun saveLayers(size: CanvasSize = CanvasSize.OUTPUT) {
         for ((index, layer) in layers) {
             val singleCanvas = layer.canvas[size]
-            if (singleCanvas != null) {
+            if (singleCanvas != null && !singleCanvas.parent.readOnly) {
                 println("save layer $index with size ${singleCanvas.size}")
                 singleCanvas.save("E:/Temp/processing/" + name + " " + size.toString() + index.toString() + ".png")
+                println("layer $index is saved")
             }
         }
     }
@@ -130,37 +131,45 @@ class CanvasLayer(
         return true
     }
 
+    /**
+     *
+     * (default rate is 60fps, ~17ms for each draw())
+     * renderDuration
+
+     */
     fun render() {
         val renderDuration = 20L
         val timing = Timing()
-        val sizeLimit = if (appIsIdle()) CanvasSize.OUTPUT else CanvasSize.PREVIEW
-        Logger.info("Current sizeLimit = ${sizeLimit.name}")
+        val sizeEnd = if (appIsIdle()) CanvasSize.OUTPUT else CanvasSize.PREVIEW
+//        Logger.info("Current sizeLimit = ${sizeEnd.name}")
         while (timing.get() < renderDuration) {
-            if (!renderNextElement(sizeLimit))
+            if (!renderNextElement(CanvasSize.PREVIEW, sizeEnd)) {
                 return
+            }
         }
     }
 
     /**
-     * Rendering of Drawables until a certain amount of time is reached
-     * (default rate is 60fps, ~17ms for each draw())
-     * renderDuration
+     * Rendering of one drawable
+     * Returns true if there was a drawable to render
+     * returns false if every drawable inside the range of sizes is already rendered
      */
-    fun renderNextElement(sizeLimit: CanvasSize): Boolean {
-        for (size in CanvasSize.values()) {
-            if (size > sizeLimit)
-                return false
+    fun renderNextElement(sizeStart: CanvasSize = CanvasSize.PREVIEW, sizeEnd: CanvasSize = CanvasSize.OUTPUT): Boolean {
+        val sizesToRender = CanvasSize.values().filter { it >= sizeStart && it <= sizeEnd }
+        for (size in sizesToRender) {
             for ((_, canvas) in layers) {
-                if (canvas.renderNextElement(size)) {
-                    return true
-                }
+                if (!canvas.readOnly)
+                    if (canvas.renderNextElement(size)) {
+                        return true
+                    }
             }
         }
         return false
     }
 
-    fun contains(x: Float, y: Float): Boolean =
-        !(x < 0 || y < 0 || x > width || y > height)
+    fun contains(vec: Vec) : Boolean = contains(vec.x, vec.y)
+
+    fun contains(x: Float, y: Float): Boolean = !(x < 0 || y < 0 || x > width || y > height)
 
     fun appIsIdle(): Boolean = !(app.mousePressed || app.keyPressed || lastFrameAdded > app.frameCount - 4)
 
