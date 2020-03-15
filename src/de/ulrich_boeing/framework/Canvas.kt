@@ -1,6 +1,7 @@
 package de.ulrich_boeing.framework
 
 import de.ulrich_boeing.basics.Clipping
+import de.ulrich_boeing.drawables.Drawable
 import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage

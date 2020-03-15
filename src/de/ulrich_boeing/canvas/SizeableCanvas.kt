@@ -1,6 +1,6 @@
 package de.ulrich_boeing.canvas
 
-import de.ulrich_boeing.framework.Drawable
+import de.ulrich_boeing.drawables.Drawable
 import org.tinylog.kotlin.Logger
 import processing.core.PApplet
 import processing.core.PGraphics

@@ -12,5 +12,6 @@
     <orderEntry type="library" name="org.tinylog:tinylog-impl:2.0.0-M4.3" level="application" />
     <orderEntry type="library" name="org.processing:core:3.3.7" level="application" />
     <orderEntry type="module" module-name="PictureBlob" />
+    <orderEntry type="library" name="controlP5" level="application" />
   </component>
 </module>
