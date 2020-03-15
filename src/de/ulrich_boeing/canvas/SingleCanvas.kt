@@ -52,8 +52,10 @@ internal class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
     }
 
     fun save(path: String) {
-        if (parent.hasImage || drawnElements > 0)
+        if (drawnElements > 0) {
+            println(path)
             g.save(path)
+        }
     }
 
 }

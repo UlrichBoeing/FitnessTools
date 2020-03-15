@@ -15,7 +15,7 @@ class CanvasLayer(
     val app: PApplet,
     val width: Int,
     val height: Int,
-    val sizes: Map<CanvasSize, Float> = mapOf(CanvasSize.PREVIEW to 0.8f, CanvasSize.OUTPUT to 5f)
+    val sizes: Map<CanvasSize, Float> = mapOf(CanvasSize.PREVIEW to 0.8f, CanvasSize.OUTPUT to 2f)
 
 ) {
     companion object {
@@ -122,7 +122,7 @@ class CanvasLayer(
     fun saveLayers(size: CanvasSize = CanvasSize.OUTPUT) {
         for ((index, layer) in layers) {
             val singleCanvas = layer.canvas[size]
-            if (singleCanvas != null && !singleCanvas.parent.readOnly) {
+            if (singleCanvas != null) {
                 println("save layer $index with size ${singleCanvas.size}")
                 singleCanvas.save("E:/Temp/processing/" + name + " " + size.toString() + index.toString() + ".png")
                 println("layer $index is saved")

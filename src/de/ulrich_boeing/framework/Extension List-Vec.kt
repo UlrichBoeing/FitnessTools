@@ -17,7 +17,6 @@ fun List<Vec>.drawAsShape(g: PGraphics) {
     g.endShape()
 }
 
-
 fun List<Vec>.drawAsLine(g: PGraphics) {
     g.beginShape()
     for (p in this) {

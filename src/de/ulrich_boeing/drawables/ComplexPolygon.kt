@@ -7,7 +7,7 @@ import processing.core.PGraphics
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-class ComplexPolygon(data: DrawableData): Drawable(data) {
+class ComplexPolygon(position: Vec, data: DrawableData): Drawable(position, data) {
     val points: List<Vec>
     init {
         val startRadius = data.size * (data.variance / 100f)
@@ -27,6 +27,6 @@ class ComplexPolygon(data: DrawableData): Drawable(data) {
         g.fill(data.color.setAlpha(data.maxOpacity))
         g.noStroke()
         g.scale(size)
-        points.move(data.position).drawAsShape(g)
+        points.move(position).drawAsShape(g)
     }
 }

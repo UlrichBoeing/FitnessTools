@@ -3,20 +3,28 @@ package de.ulrich_boeing.drawables
 import de.ulrich_boeing.basics.COLOR_BLACK
 import de.ulrich_boeing.basics.Vec
 import processing.core.PGraphics
+import java.lang.RuntimeException
 
 data class DrawableData(
-    val position: Vec,
-    val color: Int = COLOR_BLACK,
-    val targetColor: Int = COLOR_BLACK,
-    val size: Float = 20f,
-    val complexity: Float = 50f,
-    val variance: Float = 50f,
-    val minOpacity: Int = 10,
-    val maxOpacity: Int = 60,
-    val className: String = ""
-
+    var color: Int = COLOR_BLACK,
+    var targetColor: Int = COLOR_BLACK,
+    var size: Float = 20f,
+    var complexity: Float = 50f,
+    var variance: Float = 50f,
+    var minOpacity: Int = 10,
+    var maxOpacity: Int = 60,
+    var className: String = ""
 )
 
-abstract class Drawable(val data: DrawableData) {
+abstract class Drawable(val position: Vec, val data: DrawableData) {
+    companion object {
+        fun create(position: Vec, data: DrawableData): Drawable {
+            return when (data.className) {
+                "SimpleCircle" -> SimpleCircle(position, data)
+                "ComplexPolygon" -> ComplexPolygon(position, data)
+                else -> throw RuntimeException("'" + data.className + "' is a non-existing class")
+            }
+        }
+    }
     abstract fun draw(g: PGraphics, size: Float)
 }
