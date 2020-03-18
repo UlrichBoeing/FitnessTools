@@ -14,7 +14,11 @@ data class DrawableData(
     var minOpacity: Int = 10,
     var maxOpacity: Int = 60,
     var className: String = ""
-)
+) {
+    fun sliderNames(): List<String> = listOf("size", "complexity", "variance", "minOpacity", "maxOpacity")
+    fun getSliderMaxValues(): List<Float> = listOf(100f, 100f, 100f, 255f, 255f)
+    fun getSliderValues(): List<Float> = listOf(size, complexity, variance, minOpacity.toFloat(), maxOpacity.toFloat())
+}
 
 abstract class Drawable(val position: Vec, val data: DrawableData) {
     companion object {
