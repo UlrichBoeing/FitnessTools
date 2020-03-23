@@ -7,6 +7,7 @@ import java.awt.Color.HSBtoRGB
 
 const val COLOR_WHITE = 0xFFFFFFFF.toInt()
 const val COLOR_BLACK = 0xFF000000.toInt()
+const val COLOR_GRAY = 0xFF7F7F7F.toInt()
 const val COLOR_RED = 0xFFFF0000.toInt()
 const val COLOR_GREEN = 0xFF00FF00.toInt()
 const val COLOR_BLUE = 0xFF0000FF.toInt()

@@ -1,12 +1,13 @@
 package de.ulrich_boeing.drawables
 
 import de.ulrich_boeing.basics.COLOR_BLACK
+import de.ulrich_boeing.basics.COLOR_BLUE
 import de.ulrich_boeing.basics.Vec
 import processing.core.PGraphics
 import java.lang.RuntimeException
 
 data class DrawableData(
-    var color: Int = COLOR_BLACK,
+    var color: Int = COLOR_BLUE,
     var targetColor: Int = COLOR_BLACK,
     var size: Float = 20f,
     var complexity: Float = 50f,
@@ -31,4 +32,12 @@ abstract class Drawable(val position: Vec, val data: DrawableData) {
         }
     }
     abstract fun draw(g: PGraphics, size: Float)
+}
+
+fun List<DrawableData>.complement(count: Int): List<DrawableData> {
+    return List<DrawableData>(count) { i ->
+        if (i < this.size)
+            this[i]
+        else
+            this.last().copy() }
 }
