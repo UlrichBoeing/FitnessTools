@@ -6,6 +6,7 @@ import de.ulrich_boeing.basics.Vec
 import de.ulrich_boeing.basics.drawAsCircle
 import processing.core.PGraphics
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -39,7 +40,7 @@ fun List<Vec>.drawAsCurvedShape(g: PGraphics) {
     g.endShape()
 }
 
-fun List<Vec>.drawPoints(g: PGraphics) {
+fun List<Vec>.drawAsCircles(g: PGraphics) {
     for (p in this) {
         p.drawAsCircle(g)
     }
@@ -75,6 +76,12 @@ fun createPolygon(count: Int) = List(count) { i ->
     Vec(cos(i * Vec.TAU / count), sin(i * Vec.TAU / count))
 }
 
+fun createLine(start: Vec, end: Vec, gap: Float): List<Vec> {
+    val distance = start.distance(end)
+    val count = (distance / gap).roundToInt()
+    return start.lerpList(end, count)
+}
+
 fun List<Vec>.center(range: IntRange = 0 until size): Vec {
     val sum = range.fold(Vec(0, 0)) { sum, element -> sum + this[element % size] }
     return sum.div(range.count().toFloat())
@@ -94,6 +101,20 @@ fun List<Vec>.zipTweenPoints(tweenPoints: List<Vec>): List<Vec> {
     }
     return newList
 }
+
+operator fun List<Vec>.plus(vec: Vec): List<Vec> {
+    return List(this.size) { i -> this[i] + vec }
+}
+
+fun List<Vec>.plusToList(vec: Vec): List<Vec> {
+    for (vecInList in this)
+         vecInList += vec
+    return this
+}
+operator fun List<Vec>.times(n: Float): List<Vec> {
+    return List(this.size) {i -> this[i].times(n)}
+}
+
 
 fun List<Vec>.shiftInCircle(radius: Float) = List(this.size) { i -> this[i].shiftInCircle(radius) }
 

@@ -1,5 +1,6 @@
 package de.ulrich_boeing.canvas
 
+import de.ulrich_boeing.basics.Point
 import de.ulrich_boeing.basics.Timing
 import de.ulrich_boeing.basics.Vec
 import de.ulrich_boeing.extensions.fileNameFromPath
@@ -62,6 +63,13 @@ class CanvasLayer(
 
     fun setBlendMode(blendMode: Int) {
         curSizeableCanvas.blendMode = blendMode
+    }
+
+    fun filterOutside(vecList: List<Vec>): List<Vec> = vecList.filter { vec -> contains(vec) }
+
+    fun getColors(vecList: List<Vec>, index: Int = curReadIndex): List<Point> {
+        val filteredList = filterOutside(vecList)
+        return List(filteredList.size) { i -> Point(filteredList[i], getColor(filteredList[i], index)) }
     }
 
     fun getColor(vec: Vec, index: Int = curReadIndex): Int = getColor(vec.x, vec.y, index)

@@ -28,9 +28,9 @@ internal class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
         val xInt = (x * size).toInt()
         val yInt = (y * size).toInt()
         val index = xInt + yInt * g.width
-        g.loadPixels()
+//        g.loadPixels()
         val c = g.pixels[index]
-        g.updatePixels()
+//        g.updatePixels()
         return c
     }
 

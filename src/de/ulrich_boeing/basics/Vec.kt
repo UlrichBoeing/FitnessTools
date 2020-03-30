@@ -41,7 +41,7 @@ open class Vec(var x: Float, var y: Float) {
     }
 
     //    fun copy(): Vec = Vec(x, y)
-    fun set(x: Float, y: Float) {
+    inline fun set(x: Float, y: Float) {
         this.x = x
         this.y = y
     }
@@ -169,7 +169,7 @@ open class Vec(var x: Float, var y: Float) {
 
     fun lerp(vec: Vec, amount: Float): Vec = this + (vec - this) * amount
 
-    fun lerpArr(vec: Vec, count: Int): Array<Vec> = Array<Vec>(count, { i -> lerp(vec, (i.toFloat() / (count - 1))) })
+    fun lerpList(vec: Vec, count: Int) = List<Vec>(count, { i -> lerp(vec, (i.toFloat() / (count - 1))) })
 
 //    fun tweenPoints(end: Vec, count: Int): Array<Vec> = Array(count) {i -> }
 
