@@ -1,9 +1,7 @@
 package de.ulrich_boeing.framework
 
-import de.ulrich_boeing.basics.COLOR_RED
-import de.ulrich_boeing.basics.Point
-import de.ulrich_boeing.basics.Vec
-import de.ulrich_boeing.basics.drawAsCircle
+import de.ulrich_boeing.basics.*
+import de.ulrich_boeing.canvas.CanvasLayer
 import processing.core.PGraphics
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -81,6 +79,25 @@ fun createLine(start: Vec, end: Vec, gap: Float): List<Vec> {
     val count = (distance / gap).roundToInt()
     return start.lerpList(end, count)
 }
+
+fun createGridFromCenter(center:Vec, width: Float, height: Float, gap: Float): List<Vec> {
+    val rect = Rect.fromCenter(center, width, height)
+    return createGrid(rect, gap)
+}
+
+fun createGrid(rect: Rect, gap: Float): List<Vec> {
+    val vecList = mutableListOf<Vec>()
+    val xCount = (rect.width / gap).roundToInt()
+    val yCount = (rect.height / gap).roundToInt()
+
+    for (x in 0..xCount)
+        for (y in 0..yCount)
+            vecList.add(Vec(rect.x + (rect.width / xCount) * x, rect.y + (rect.height / yCount) * y))
+
+    return vecList
+}
+
+fun List<Vec>.toPoints(canvas: CanvasLayer): List<Point> = canvas.getColors(this)
 
 fun List<Vec>.center(range: IntRange = 0 until size): Vec {
     val sum = range.fold(Vec(0, 0)) { sum, element -> sum + this[element % size] }

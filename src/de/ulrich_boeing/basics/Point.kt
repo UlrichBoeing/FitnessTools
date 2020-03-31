@@ -13,5 +13,17 @@ class Point(x: Float, y: Float, var color: Int) : Vec(x, y){
 
 fun Point.drawAsCircle(g: PGraphics, radius : Float = 16f) {
     g.fill(color)
+    g.stroke(COLOR_WHITE.setAlpha(100))
+    g.strokeWeight(1f)
     g.ellipse(x, y, radius, radius)
+}
+
+class ComparePoint(val point: Point, val comparePoint: Point) {
+    val distance = point.distance(comparePoint)
+    val angle = (point - comparePoint).angle + Vec.PI
+    val rgbDif: Int = (point.color.getRGBDiff(comparePoint.color)).sum()
+
+    init {
+        println("angle: ${angle.toDegrees()}")
+    }
 }

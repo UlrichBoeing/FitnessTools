@@ -17,9 +17,8 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
         width.toFloat(),
         height.toFloat()
     )
-
-    constructor(): this(0f, 0f, 0f, 0f)
-    constructor(width: Int, height: Int): this(0f, 0f, width.toFloat(), height.toFloat())
+    constructor() : this(0f, 0f, 0f, 0f)
+    constructor(width: Int, height: Int) : this(0f, 0f, width.toFloat(), height.toFloat())
     constructor(other: Rect) : this(other.x, other.y, other.width, other.height)
 
     companion object {
@@ -27,6 +26,9 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
             val p = center - Vec(radius, radius)
             return Rect(p.x, p.y, radius * 2, radius * 2)
         }
+
+        fun fromCenter(center: Vec, width: Float, height: Float): Rect =
+            Rect(center.x - width / 2, center.y - height / 2, width, height)
     }
 
     var width: Float = 0f
@@ -59,11 +61,11 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
      */
     val standardRect: Rect
         get() {
-        val numPixels = 1000000
-        val newWidth = sqrt(numPixels * aspectRatio)
-        val newHeight = height * (newWidth / width)
-        return Rect(x, y, newWidth, newHeight)
-    }
+            val numPixels = 1000000
+            val newWidth = sqrt(numPixels * aspectRatio)
+            val newHeight = height * (newWidth / width)
+            return Rect(x, y, newWidth, newHeight)
+        }
 
     init {
         this.width = width
@@ -101,7 +103,7 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
         return !(x > other.right || right < other.x || y > other.bottom || bottom < other.y)
     }
 
-    fun inside(x: Int, y: Int): Boolean =  !(x < left || x > right || y < top || y > bottom)
+    fun inside(x: Int, y: Int): Boolean = !(x < left || x > right || y < top || y > bottom)
 
     fun getEnclosingRectangle(other: Rect): Rect {
         val new = Rect(0, 0, 0, 0)

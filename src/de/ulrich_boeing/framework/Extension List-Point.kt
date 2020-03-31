@@ -1,9 +1,6 @@
 package de.ulrich_boeing.framework
 
-import de.ulrich_boeing.basics.Point
-import de.ulrich_boeing.basics.Vec
-import de.ulrich_boeing.basics.drawAsCircle
-import de.ulrich_boeing.basics.getRGBDiff
+import de.ulrich_boeing.basics.*
 import processing.core.PGraphics
 
 fun List<Point>.drawAsCircles(g: PGraphics, radius: Float = 16f) {
@@ -26,6 +23,9 @@ fun List<Point>.indexOfFirstDif(color: Int, limit: Int): Int {
     return this.lastIndex
 }
 
+fun List<Point>.toComparePoints(comparePoint: Point) = List<ComparePoint>(this.size) {i -> ComparePoint(this[i], comparePoint) }
+
+fun List<ComparePoint>.toPoints(): List<Point> = List<Point>(this.size) {i -> this[i].point}
 /**
  * return first element in the list with a RGB-difference larger than limit
  */

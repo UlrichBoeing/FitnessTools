@@ -108,6 +108,8 @@ open class Vec(var x: Float, var y: Float) {
         }
     }
 
+
+
     fun normalize(): Vec {
         if (length != 0f) {
             this /= length
