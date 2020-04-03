@@ -90,8 +90,8 @@ fun createGrid(rect: Rect, gap: Float): List<Vec> {
     val xCount = (rect.width / gap).roundToInt()
     val yCount = (rect.height / gap).roundToInt()
 
-    for (x in 0..xCount)
         for (y in 0..yCount)
+            for (x in 0..xCount)
             vecList.add(Vec(rect.x + (rect.width / xCount) * x, rect.y + (rect.height / yCount) * y))
 
     return vecList

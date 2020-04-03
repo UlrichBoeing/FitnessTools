@@ -20,12 +20,13 @@ fun List<Point>.indexOfFirstDif(color: Int, limit: Int): Int {
             return index
         index++
     }
+    print(this.lastIndex)
     return this.lastIndex
 }
 
 fun List<Point>.toComparePoints(comparePoint: Point) = List<ComparePoint>(this.size) {i -> ComparePoint(this[i], comparePoint) }
 
-fun List<ComparePoint>.toPoints(): List<Point> = List<Point>(this.size) {i -> this[i].point}
+//fun List<ComparePoint>.toPoints(): List<Point> = List<Point>(this.size) {i -> this[i].point}
 /**
  * return first element in the list with a RGB-difference larger than limit
  */
@@ -43,6 +44,17 @@ fun List<Point>.cutByColorDif(limit: Int): List<Point> {
 
 fun List<Point>.colorDifToNext(): IntArray = IntArray(this.size - 1) { i ->
     this[i].color.getRGBDiff(this[i + 1].color).sum()
+}
+
+fun List<Point>.setColor(color: Int) {
+    for (p in this) {
+        p.color = color
+    }
+}
+
+fun List<Point>.setColor(color1: Int, color2: Int) {
+    for (i in 1..this.lastIndex)
+        this[i].color = color1.mixColor(color2, i.toFloat() / this.size)
 }
 
 fun IntArray.indexOfMax(): Int {

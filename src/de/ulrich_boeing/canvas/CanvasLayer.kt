@@ -190,7 +190,7 @@ class CanvasLayer(
 
     fun contains(vec: Vec): Boolean = contains(vec.x, vec.y)
 
-    fun contains(x: Float, y: Float): Boolean = !(x < 0 || y < 0 || x > width || y > height)
+    fun contains(x: Float, y: Float): Boolean = !(x < 0 || y < 0 || x >= width || y >= height)
 
     fun appIsIdle(): Boolean = !(app.mousePressed || app.keyPressed || lastFrameAdded > app.frameCount - 4)
 

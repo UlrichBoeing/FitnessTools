@@ -6,7 +6,7 @@ import processing.core.PGraphics
     Kann hier ein Kommentar in deutsch stehen?
     
  */
-class Point(x: Float, y: Float, var color: Int) : Vec(x, y){
+open class Point(x: Float, y: Float, var color: Int) : Vec(x, y){
     constructor(vec: Vec, color: Int) : this(vec.x, vec.y, color)
     constructor(x: Int, y: Int, color: Int) : this(x.toFloat(), y.toFloat(), color)
 }
@@ -18,12 +18,12 @@ fun Point.drawAsCircle(g: PGraphics, radius : Float = 16f) {
     g.ellipse(x, y, radius, radius)
 }
 
-class ComparePoint(val point: Point, val comparePoint: Point) {
-    val distance = point.distance(comparePoint)
-    val angle = (point - comparePoint).angle + Vec.PI
+class ComparePoint(point: Point, val comparePoint: Point): Point(point.x, point.y, point.color) {
+    val distanceTo = point.distance(comparePoint)
+    val angleTo = ((point - comparePoint).angle + Vec.TAU) % Vec.TAU
     val rgbDif: Int = (point.color.getRGBDiff(comparePoint.color)).sum()
 
     init {
-        println("angle: ${angle.toDegrees()}")
+        println("angleTo: ${angleTo}")
     }
 }

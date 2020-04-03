@@ -25,10 +25,14 @@ internal class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
     }
 
     fun getColor(x: Float, y: Float): Int {
-        val xInt = (x * size).toInt()
-        val yInt = (y * size).toInt()
+//        println("before conversion x: $x, y: $y width: ${parent.width} height: ${parent.height} size: $size")
+        val xInt = (x * width / parent.width).toInt()
+        val yInt = (y * height / parent.height).toInt()
         val index = xInt + yInt * g.width
 //        g.loadPixels()
+//        if (index >= g.pixels.size || index < 0) {
+//            println("xInt: $xInt, yInt: $yInt, index: $index, g.pixels.size: ${g.pixels.size} width: $width height: $height")
+//        }
         val c = g.pixels[index]
 //        g.updatePixels()
         return c
