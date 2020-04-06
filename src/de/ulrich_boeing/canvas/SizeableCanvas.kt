@@ -16,6 +16,7 @@ internal class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Fl
     var blendMode = PApplet.BLEND
     val hasImage = (image != null)
     val readOnly = hasImage
+    var visible = true
 
     val app: PApplet
         get() = parent.app

@@ -9,6 +9,11 @@ fun List<Point>.drawAsCircles(g: PGraphics, radius: Float = 16f) {
     }
 }
 
+fun List<ComparePoint>.averageRGBDif(): Float {
+    val sum = this.fold(0) { sum, point -> sum + point.rgbDif }
+    return sum / this.size.toFloat()
+}
+
 /**
  * return index of first element in the list with a RGB-difference larger than limit
  */
@@ -46,15 +51,17 @@ fun List<Point>.colorDifToNext(): IntArray = IntArray(this.size - 1) { i ->
     this[i].color.getRGBDiff(this[i + 1].color).sum()
 }
 
-fun List<Point>.setColor(color: Int) {
+fun List<Point>.setColor(color: Int): List<Point> {
     for (p in this) {
         p.color = color
     }
+    return this
 }
 
 fun List<Point>.setColor(color1: Int, color2: Int) {
-    for (i in 1..this.lastIndex)
-        this[i].color = color1.mixColor(color2, i.toFloat() / this.size)
+    for (i in 0..this.lastIndex) {
+        this[i].color = color1.mixColor(color2, i.toFloat() / this.lastIndex)
+    }
 }
 
 fun IntArray.indexOfMax(): Int {

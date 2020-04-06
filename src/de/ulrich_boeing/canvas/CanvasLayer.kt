@@ -107,6 +107,10 @@ class CanvasLayer(
         return index
     }
 
+    fun toggleVisibility(index: Int) {
+        layers[index]!!.visible = !(layers[index]!!.visible)
+    }
+
     fun getImage(size: CanvasSize = CanvasSize.PREVIEW): PGraphics? {
         val sizeFactor = sizes[size] ?: 0f
         if (sizeFactor <= 0) {
@@ -117,7 +121,9 @@ class CanvasLayer(
             val g = app.createGraphics(imageWidth, imageHeight)
             g.beginDraw()
             for ((index, canvas) in layers) {
-                canvas.drawGraphics(g, size)
+                if (canvas.visible) {
+                    canvas.drawGraphics(g, size)
+                }
 //                if (canvas.canvas.containsKey(size)) {
 //                    g.image(canvas.canvas[size]!!.g, 0f, 0f, imageWidth.toFloat(), imageHeight.toFloat())
 //                }

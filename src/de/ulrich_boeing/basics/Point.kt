@@ -24,6 +24,6 @@ class ComparePoint(point: Point, val comparePoint: Point): Point(point.x, point.
     val rgbDif: Int = (point.color.getRGBDiff(comparePoint.color)).sum()
 
     init {
-        println("angleTo: ${angleTo}")
+//        println("angleTo: ${angleTo}")
     }
 }
