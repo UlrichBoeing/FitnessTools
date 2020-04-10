@@ -1,7 +1,6 @@
 package de.ulrich_boeing.framework
 
-import de.ulrich_boeing.basics.ComparePoint
-import de.ulrich_boeing.basics.Vec
+import de.ulrich_boeing.basics.*
 
 fun List<ComparePoint>.splitAngles(countSlices: Int): List<List<ComparePoint>> {
     var slices = List(countSlices) { mutableListOf<ComparePoint>() }
@@ -39,16 +38,32 @@ fun List<ComparePoint>.indexOfFirstDif(limit: Int): Int {
     return this.lastIndex
 }
 
-fun List<ComparePoint>.zipTweenPoints(tweenPoints: List<ComparePoint>): List<ComparePoint> {
-    val newSize = when {
-        size == tweenPoints.size -> 2 * size
-        size  - 1 == tweenPoints.size -> 2 * size -1
-        else -> throw RuntimeException("zip not possible, list tweenPoints has wrong size.")
+fun List<ComparePoint>.indexOfFirstBrightDif(limit: Float): Int {
+    if (isEmpty())
+        println("list is empty!!!")
+    val maxDif = this.maxBy { it.brightDif }
+    var newLimit = limit
+    if (maxDif!!.brightDif < 0.4)
+        newLimit = maxDif!!.brightDif / 2
+
+    var i = 0
+    while (i < this.size) {
+        if (this[i].brightDif > newLimit)
+            return i
+        i++
     }
-    var newList = MutableList(newSize) { i -> this[i / 2] }
-    for (i in tweenPoints.indices) {
-        newList[i * 2 + 1] = tweenPoints[i]
-    }
-    return newList
+    return this.lastIndex
+}
+
+fun List<ComparePoint>.getTweenPointOfShape(index: Int, pool: List<ComparePoint>): ComparePoint {
+    val nextIndex = if (index < this.lastIndex) index + 1 else 0
+    val middlePoint = (this[index] + this[nextIndex]) * 0.5f
+    val fullRadius = (this[index] - middlePoint).length
+    val aroundMiddlePoint = pool.filter { it.distance(middlePoint) < fullRadius * 0.5f }
+    val i = aroundMiddlePoint.indexOfFirstDif(100)
+    val insertPoint = aroundMiddlePoint[i]
+
+    insertPoint.color = COLOR_RED
+    return insertPoint
 }
 

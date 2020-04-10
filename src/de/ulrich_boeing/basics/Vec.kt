@@ -1,5 +1,6 @@
 package de.ulrich_boeing.basics
 
+import de.ulrich_boeing.canvas.CanvasLayer
 import processing.core.PGraphics
 import kotlin.math.*
 import kotlin.random.Random
@@ -244,5 +245,8 @@ fun Float.toRadians(): Float = this * Vec.TAU / 360f
 fun Vec.drawAsCircle(g: PGraphics, radius : Float = 8f) {
     g.ellipse(x, y, radius, radius)
 }
+
+fun Vec.toPoint(canvas: CanvasLayer): Point = Point(this, canvas.getColor(this))
+
 
 

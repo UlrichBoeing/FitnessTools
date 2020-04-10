@@ -14,7 +14,7 @@ fun List<ComparePoint>.averageRGBDif(): Float {
     return sum / this.size.toFloat()
 }
 
-/**
+ /**
  * return index of first element in the list with a RGB-difference larger than limit
  */
 fun List<Point>.indexOfFirstDif(color: Int, limit: Int): Int {

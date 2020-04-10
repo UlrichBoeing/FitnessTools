@@ -8,7 +8,7 @@ import processing.core.PGraphics
 
 class Line(position: Vec, data: DrawableData) : Drawable(position, data) {
     val color = canvasLayer.getColor(position)
-    val point = Point(position, color)
+    val point = Point(position, COLOR_WHITE)
     val polygonPoints = createPolygon(40).times(100f).plusToList(position)
     var endPoints = mutableListOf<Point>()
     var grid =
@@ -16,17 +16,18 @@ class Line(position: Vec, data: DrawableData) : Drawable(position, data) {
             .filter { it.distanceTo < data.size * 3f }
 //            .filter { it.distanceTo > data.size * 0.5f }
 
+    val maxDifPoint = grid.indexOfFirstBrightDif(0.5f)
     var countSlices = 5
     var slices = grid.splitAngles(countSlices).removeEmpty()
     val sortedSlices = List(slices.size) { i -> slices[i].sortedBy { it.distanceTo } }
-    val maxDif = List<Int>(sortedSlices.size) { i -> sortedSlices[i].indexOfFirstDif(100) }
+    val maxDif = List<Int>(sortedSlices.size) { i -> sortedSlices[i].indexOfFirstDif(8  ) }
     var points = List<ComparePoint>(maxDif.size) { i -> slices[i][maxDif[i]] }
 
     init {
-        for (i in 1..2) {
-            val tweenPoints = points.tweenPointsOfShape().shiftInCircle(3f).toPoints(canvasLayer).toComparePoints(point)
-            points = points.zipTweenPoints(tweenPoints)
-        }
+//        for (i in 1..2) {
+//            val tweenPoints = points.tweenPointsOfShape().shiftInCircle(30f).toPoints(canvasLayer).toComparePoints(point)
+//            points = points.zipTweenPoints(tweenPoints)
+//        }
 
 //        for (p in polygonPoints) {
 //            val lineVecs = createLine(position, p, 2f)
@@ -55,7 +56,17 @@ class Line(position: Vec, data: DrawableData) : Drawable(position, data) {
 //        }
 //        val average = points.averageRGBDif()
 //        points = points.filter { it.rgbDif < average }
-        points.drawAsCurvedShape(g)
+//        grid.drawAsCircles(g, 1f)
+//        points.drawAsCurvedShape(g)
+        grid[maxDifPoint].color = COLOR_YELLOW.setAlpha(60)
+        grid[maxDifPoint].drawAsCircle(g, 4f)
+//        points.setColor(COLOR_BLUE )
+//        for (i in 0..points.lastIndex) {
+//            val p = points.getTweenPointOfShape(i, grid)
+//            p.drawAsCircle(g)
+//
+//        }
+//        points.drawAsCircles(g, 24f)
     }
 
 

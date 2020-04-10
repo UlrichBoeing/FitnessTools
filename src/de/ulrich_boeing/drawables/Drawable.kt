@@ -30,6 +30,7 @@ abstract class Drawable(val position: Vec, val data: DrawableData) {
                 "Line" -> Line(position, data)
                 "SimpleCircle" -> SimpleCircle(position, data)
                 "ComplexPolygon" -> ComplexPolygon(position, data)
+                "FilterGrid" -> FilterGrid(position, data)
                 else -> throw RuntimeException("'" + data.className + "' is a non-existing class")
             }
         }
