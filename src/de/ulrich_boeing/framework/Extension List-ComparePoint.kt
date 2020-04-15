@@ -12,6 +12,17 @@ fun List<ComparePoint>.splitAngles(countSlices: Int): List<List<ComparePoint>> {
     return slices
 }
 
+fun List<ComparePoint>.getNearby(other: ComparePoint, distance: Float): List<ComparePoint> {
+    val newList = mutableListOf<ComparePoint>()
+    val squareDistance = distance * distance
+    for (p in this) {
+        if (p != other)
+            if (p.squareDistance(other) < squareDistance)
+                newList.add(p)
+    }
+    return newList
+}
+
 fun List<List<ComparePoint>>.removeEmpty(): List<List<ComparePoint>> {
     val newList = mutableListOf<List<ComparePoint>>()
     for (list in this) {

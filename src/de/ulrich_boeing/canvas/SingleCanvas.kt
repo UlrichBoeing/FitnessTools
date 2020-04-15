@@ -45,7 +45,7 @@ internal class SingleCanvas(val parent: SizeableCanvas, val size: Float) {
 //            Logger.info("Render is already complete")
             return false
         }
-        Logger.info("Draw element $drawnElements in size ${size.toString()}")
+//        Logger.info("Draw element $drawnElements in size ${size.toString()}")
         val drawable = parent.list[drawnElements++]
 
         g.beginDraw()

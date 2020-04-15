@@ -4,6 +4,10 @@ import java.lang.RuntimeException
 
 data class WeightedVal(val values: FloatArray, val weight: Float = 1f)
 
+fun combine(vararg elements: WeightedVal): FloatArray {
+    return elements.toList().getValues()
+}
+
 fun List<WeightedVal>.getValues(): FloatArray {
     val sumWeight = this.map{ it.weight }.sum()
     val numValues = this.getAndCheckNumValues()

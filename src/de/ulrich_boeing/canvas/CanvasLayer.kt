@@ -58,6 +58,9 @@ class CanvasLayer(
 
     fun add(drawable: Drawable) {
         curSizeableCanvas.add(drawable)
+//        curLayer++
+//        curSizeableCanvas.add(drawable)
+//        curLayer--
         lastFrameAdded = app.frameCount
     }
 
