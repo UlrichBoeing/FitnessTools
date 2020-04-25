@@ -105,6 +105,16 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
 
     fun inside(x: Int, y: Int): Boolean = !(x < left || x > right || y < top || y > bottom)
 
+    fun contains(vec: Vec): Boolean = !(vec.x < left || vec.x > right || vec.y < top || vec.y > bottom)
+
+    fun splitTo4(vec: Vec): List<Rect> {
+        val rect1 = Rect(x, y, vec.x - x, vec.y - y)
+        val rect2 = Rect(vec.x, y, right - vec.x, vec.y - y)
+        val rect3 = Rect(vec.x, vec.y, right - vec.x, bottom - vec.y)
+        val rect4 = Rect(x, vec.y, vec.x - x, bottom - vec.y)
+        return listOf(rect1, rect2, rect3, rect4)
+    }
+
     fun getEnclosingRectangle(other: Rect): Rect {
         val new = Rect(0, 0, 0, 0)
         new.left = if (left < other.left) left else other.left
@@ -129,12 +139,6 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
 
 }
 
-fun Rect.debugDraw(g: PGraphics, accent: Boolean = false) {
-    g.fill(255f, 40f)
-    g.strokeWeight(2f)
-    if (!accent)
-        g.stroke(255f, 100f)
-    else
-        g.stroke(255f, 0f, 0f, 100f)
+fun Rect.draw(g: PGraphics) {
     g.rect(this.x, this.y, this.width, this.height)
 }

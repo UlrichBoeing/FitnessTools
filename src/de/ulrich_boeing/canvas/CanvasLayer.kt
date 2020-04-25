@@ -49,7 +49,7 @@ class CanvasLayer(
         get() = layers.getValue(curLayer)
 
     private var curReadIndex: Int = 1
-    private var lastFrameAdded = -1
+    private var lastFrameAdded = -1 
     var name: String = ""
 
     init {

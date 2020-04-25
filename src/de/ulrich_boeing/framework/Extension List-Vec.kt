@@ -38,9 +38,9 @@ fun List<Vec>.drawAsCurvedShape(g: PGraphics) {
     g.endShape()
 }
 
-fun List<Vec>.drawAsCircles(g: PGraphics) {
+fun List<Vec>.drawAsCircles(g: PGraphics, radius: Float) {
     for (p in this) {
-        p.drawAsCircle(g)
+        p.drawAsCircle(g, radius)
     }
 }
 
@@ -80,7 +80,7 @@ fun createLine(start: Vec, end: Vec, gap: Float): List<Vec> {
     return start.lerpList(end, count)
 }
 
-fun createGridFromCenter(center:Vec, width: Float, height: Float, gap: Float): List<Vec> {
+fun createGridFromCenter(center: Vec, width: Float, height: Float, gap: Float): List<Vec> {
     val rect = Rect.fromCenter(center, width, height)
     return createGrid(rect, gap)
 }
@@ -90,8 +90,8 @@ fun createGrid(rect: Rect, gap: Float): List<Vec> {
     val xCount = (rect.width / gap).roundToInt()
     val yCount = (rect.height / gap).roundToInt()
 
-        for (y in 0..yCount)
-            for (x in 0..xCount)
+    for (y in 0..yCount)
+        for (x in 0..xCount)
             vecList.add(Vec(rect.x + (rect.width / xCount) * x, rect.y + (rect.height / yCount) * y))
 
     return vecList
@@ -104,12 +104,12 @@ fun List<Vec>.center(range: IntRange = 0 until size): Vec {
     return sum.div(range.count().toFloat())
 }
 
-fun List<Vec>.tweenPointsOfShape():List<Vec> = List<Vec>(size) {i -> this.center(i ..(i + 1))}
+fun List<Vec>.tweenPointsOfShape(): List<Vec> = List<Vec>(size) { i -> this.center(i..(i + 1)) }
 
 fun List<Vec>.zipTweenPoints(tweenPoints: List<Vec>): List<Vec> {
     val newSize = when {
         size == tweenPoints.size -> 2 * size
-        size  - 1 == tweenPoints.size -> 2 * size -1
+        size - 1 == tweenPoints.size -> 2 * size - 1
         else -> throw RuntimeException("zip not possible, list tweenPoints has wrong size.")
     }
     var newList = MutableList(newSize) { i -> this[i / 2] }
@@ -125,13 +125,16 @@ operator fun List<Vec>.plus(vec: Vec): List<Vec> {
 
 fun List<Vec>.plusToList(vec: Vec): List<Vec> {
     for (vecInList in this)
-         vecInList += vec
+        vecInList += vec
     return this
 }
+
 operator fun List<Vec>.times(n: Float): List<Vec> {
-    return List(this.size) {i -> this[i].times(n)}
+    return List(this.size) { i -> this[i].times(n) }
 }
 
+fun List<Vec>.addUp(): Vec = this.fold(Vec(0, 0)) { sum, element -> sum + element}
+fun List<Vec>.midPoint(): Vec = this.addUp() / this.size.toFloat()
 
 fun List<Vec>.shiftInCircle(radius: Float) = List(this.size) { i -> this[i].shiftInCircle(radius) }
 
@@ -140,4 +143,18 @@ fun List<Vec>.resize(n: Float) = List(this.size) { i -> this[i] * n }
 fun List<Vec>.resize(min: Float, max: Float) = List(this.size) { i -> this[i] * Random.nextFloatInRange(min, max) }
 
 fun Random.nextFloatInRange(min: Float, max: Float) = min + this.nextFloat() * (max - min)
+
+fun List<List<Vec>>.filterByIndices(indices: IntArray) = List(indices.size) { this[indices[it]] }
+fun List<List<Vec>>.filterEmpty():List<List<Vec>> {
+    val newList = mutableListOf<List<Vec>>()
+    for (list in this)
+        if (list.size > 0)
+            newList.add(list)
+    return newList
+
+}
+
+fun List<List<Vec>>.sizeAll(): Int = this.fold(0) { sum, list -> sum + list.size }
+fun List<List<Vec>>.addUpAll(): Vec = this.fold(Vec(0, 0)) { sum, list -> sum + list.addUp() }
+fun List<List<Vec>>.midPointAll(): Vec = this.addUpAll() / this.sizeAll().toFloat()
 
