@@ -34,7 +34,6 @@ fun List<Vec>.drawAsCurvedShape(g: PGraphics) {
     for (p in this.subList(0, 3)) {
         g.curveVertex(p.x, p.y)
     }
-    println("Breite von g: " + g.width)
     g.endShape()
 }
 

@@ -10,7 +10,7 @@ import javax.swing.Spring.height
 import kotlin.math.sqrt
 
 
-class Rect(var x: Float, var y: Float, width: Float, height: Float) {
+open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
     constructor(x: Int, y: Int, width: Int, height: Int) : this(
         x.toFloat(),
         y.toFloat(),
@@ -38,7 +38,6 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
                 println("Width $value in Rect can not be negative.")
                 field = 0f
             } else
-
                 field = value
         }
 
@@ -99,11 +98,24 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) {
             height = value - y
         }
 
-    fun isOverlapping(other: Rect): Boolean {
-        return !(x > other.right || right < other.x || y > other.bottom || bottom < other.y)
-    }
+    /**
+     * returns false if only borders are intersecting
+     */
+    infix fun isOverlapping(other: Rect): Boolean =
+        !(left >= other.right || right <= other.left || top >= other.bottom || bottom <= other.top)
 
-    fun inside(x: Int, y: Int): Boolean = !(x < left || x > right || y < top || y > bottom)
+    /**
+     * returns true even if only borders are intersecting
+     */
+    infix fun intersects(other: Rect): Boolean =
+        !(left > other.right || right < other.left || top > other.bottom || bottom < other.top)
+
+    /**
+     * is other rect inside of this rect
+     */
+    fun inside(other: Rect): Boolean =
+        !(other.left < left || other.right > right || other.top < top || other.bottom > bottom)
+    fun inside(vec: Vec): Boolean = !(vec.x <= left || vec.x >= right || vec.y <= top || vec.y >= bottom)
 
     fun contains(vec: Vec): Boolean = !(vec.x < left || vec.x > right || vec.y < top || vec.y > bottom)
 

@@ -82,7 +82,7 @@ class FilterGrid(position: Vec, data: DrawableData) : Drawable(position, data) {
             var nearBy = grid.comparePoints.getNearby(cp, 10f)
             nearBy = nearBy.filter { it.color.alpha > 5 }
             cp.color = center.color.setAlpha(cp.color.alpha).mixColor(cp.color, 0.2f).mixColor(data.color.setAlpha(30), 0.0f)
-//            println("nearBY.size" + nearBy.size)
+            println("nearBY.size" + nearBy.size)
             cp.drawAsCircle(g,  0.5f * nearBy.size)
         }
 //        grid.comparePoints.drawAsCircles(g, 10f)
