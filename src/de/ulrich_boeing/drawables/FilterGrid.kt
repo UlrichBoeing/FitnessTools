@@ -5,7 +5,6 @@ import de.ulrich_boeing.extensions.*
 import de.ulrich_boeing.framework.*
 import processing.core.PGraphics
 import kotlin.math.roundToInt
-import kotlin.random.Random
 
 
 fun FloatArray.invert(): FloatArray = FloatArray(size) { i -> 1 - this[i] }

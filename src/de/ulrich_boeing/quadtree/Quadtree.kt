@@ -4,7 +4,9 @@ import de.ulrich_boeing.basics.*
 import de.ulrich_boeing.framework.drawAsCircles
 import processing.core.PGraphics
 
-class Quadtree(val rect: Rect, val capacity: Int) {
+class Quadtree(val rect: Rect) {
+//    val capacity = intArrayOf(0, 0, 0,8, 16, 32, 64, 128, 256, 50000)
+    val capacity = intArrayOf(1)
     val emptyParentNode = false
     var maxLevel = 0
     fun checkMaxLevel(level: Int) {
@@ -40,19 +42,17 @@ private class Node(val tree: Quadtree, val rect: Rect, val level: Int): Rect(rec
         if (!rect.contains(vec))
             return false
 
-        if (points.size < tree.capacity * level && !isCleared) {
+        if (points.size < tree.capacity[level] && !isCleared) {
             points.add(vec)
         } else {
             if (!hasChildren)
                 createChildren()
-//            if (hasChildren)
-//                createChildren()
-//                if (tree.emptyParentNode) {
-//                    for (p in points)
-//                        addToChild(p)
-//                    points.clear()
-//                    isCleared = true
-//                }
+                if (tree.emptyParentNode) {
+                    for (p in points)
+                        addToChild(p)
+                    points.clear()
+                    isCleared = true
+                }
             addToChild(vec)
         }
         return true
@@ -82,13 +82,10 @@ private class Node(val tree: Quadtree, val rect: Rect, val level: Int): Rect(rec
         if (!queryRect.intersects(rect))
             return
 
-//        if (points.size == 0)
-//            return
-
         if (queryRect.inside(rect))
             copyAll(list)
         else {
-            for (point in points) {
+           for (point in points) {
                 if (queryRect.contains(point))
                     list.add(point)
             }
@@ -109,8 +106,8 @@ private class Node(val tree: Quadtree, val rect: Rect, val level: Int): Rect(rec
     }
 
     fun draw(g: PGraphics) {
-        if (!isCleared && points.size > 0) {
-            g.fill(COLOR_BLUE.setAlpha(points.size * 3 * level))
+        if (points.size > 0) {
+//            g.fill(COLOR_BLUE.setAlpha(points.size * 3 * level))
             rect.draw(g)
         }
         if (hasChildren) {

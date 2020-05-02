@@ -1,13 +1,8 @@
 package de.ulrich_boeing.basics
 
-import de.ulrich_boeing.elements.Layout
-import de.ulrich_boeing.processing.Look
 import processing.core.PGraphics
-import kotlin.math.ceil
-import kotlin.math.floor
-import javax.swing.Spring.width
-import javax.swing.Spring.height
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 
 open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
@@ -17,6 +12,7 @@ open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
         width.toFloat(),
         height.toFloat()
     )
+
     constructor() : this(0f, 0f, 0f, 0f)
     constructor(width: Int, height: Int) : this(0f, 0f, width.toFloat(), height.toFloat())
     constructor(other: Rect) : this(other.x, other.y, other.width, other.height)
@@ -115,6 +111,7 @@ open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
      */
     fun inside(other: Rect): Boolean =
         !(other.left < left || other.right > right || other.top < top || other.bottom > bottom)
+
     fun inside(vec: Vec): Boolean = !(vec.x <= left || vec.x >= right || vec.y <= top || vec.y >= bottom)
 
     fun contains(vec: Vec): Boolean = !(vec.x < left || vec.x > right || vec.y < top || vec.y > bottom)
@@ -149,6 +146,12 @@ open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
         return new
     }
 
+    fun listOfRandomVec(num: Int) = List(num) {
+        Vec(
+            x + Random.nextFloat() * width,
+            y + Random.nextFloat() * height
+        )
+    }
 }
 
 fun Rect.draw(g: PGraphics) {

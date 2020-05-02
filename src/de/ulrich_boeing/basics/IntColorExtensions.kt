@@ -86,7 +86,7 @@ fun Int.getHSBDiff(other: Int): FloatArray {
 }
 
 fun Int.printAsColor() {
-    println("red=" + this.red + " green=" + this.green + " blue=" + this.blue + " alpha=" + this.alpha)
+    println("red=" + red + " green=" + green + " blue=" + blue + " alpha=" + alpha)
 }
 
 fun FloatArray.weightedAverage(weight: FloatArray): Float {

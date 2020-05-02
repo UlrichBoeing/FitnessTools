@@ -5,6 +5,7 @@ import de.ulrich_boeing.fitness_tools.Stats
 import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
+import de.ulrich_boeing.utility.Timespan
 import java.lang.RuntimeException
 import kotlin.random.Random
 
@@ -192,7 +193,7 @@ class Layout(app: PApplet, image: PImage) {
 //    }
 
     private fun draw(g: PGraphics) {
-        val timing = Timing()
+        val timing = Timespan().start()
         g.beginDraw()
 //        g.blendMode(PApplet.ADD)
         g.background(0)
@@ -201,7 +202,7 @@ class Layout(app: PApplet, image: PImage) {
 //            e.draw(g)
         }
         g.endDraw()
-        stats.drawAllTime += timing.get()
+        stats.drawAllTime += timing.time
         stats.drawAllCount++
     }
 

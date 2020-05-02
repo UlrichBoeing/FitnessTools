@@ -5,7 +5,6 @@ import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
 import java.lang.RuntimeException
-import org.tinylog.kotlin.Logger
 import kotlin.math.roundToInt
 
 internal class SingleCanvas(val parent: SizeableCanvas, val size: Float) {

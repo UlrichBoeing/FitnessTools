@@ -1,7 +1,5 @@
 package de.ulrich_boeing.basics
 
-import de.ulrich_boeing.elements.Layout
-import de.ulrich_boeing.processing.Look
 import de.ulrich_boeing.processing.set
 import processing.core.PGraphics
 import java.lang.RuntimeException

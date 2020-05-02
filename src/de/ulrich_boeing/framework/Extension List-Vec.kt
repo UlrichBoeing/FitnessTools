@@ -156,4 +156,3 @@ fun List<List<Vec>>.filterEmpty():List<List<Vec>> {
 fun List<List<Vec>>.sizeAll(): Int = this.fold(0) { sum, list -> sum + list.size }
 fun List<List<Vec>>.addUpAll(): Vec = this.fold(Vec(0, 0)) { sum, list -> sum + list.addUp() }
 fun List<List<Vec>>.midPointAll(): Vec = this.addUpAll() / this.sizeAll().toFloat()
-

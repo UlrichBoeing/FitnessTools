@@ -1,7 +1,7 @@
 package de.ulrich_boeing.canvas
 
 import de.ulrich_boeing.basics.Point
-import de.ulrich_boeing.basics.Timing
+import de.ulrich_boeing.utility.Timespan
 import de.ulrich_boeing.basics.Vec
 import de.ulrich_boeing.extensions.fileNameFromPath
 import de.ulrich_boeing.drawables.Drawable
@@ -166,10 +166,10 @@ class CanvasLayer(
      */
     fun render() {
         val renderDuration = 100L
-        val timing = Timing()
+        val renderTime = Timespan().start()
         val sizeEnd = if (appIsIdle()) CanvasSize.OUTPUT else CanvasSize.PREVIEW
 //        Logger.info("Current sizeLimit = ${sizeEnd.name}")
-        while (timing.get() < renderDuration) {
+        while (renderTime.milli < renderDuration) {
             if (!renderNextElement(CanvasSize.PREVIEW, sizeEnd)) {
                 return
             }
