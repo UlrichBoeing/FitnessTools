@@ -5,14 +5,16 @@ import de.ulrich_boeing.framework.drawAsCircles
 import processing.core.PGraphics
 
 class Quadtree(val rect: Rect) {
-//    val capacity = intArrayOf(0, 0, 0,8, 16, 32, 64, 128, 256, 50000)
-    val capacity = intArrayOf(1)
-    val emptyParentNode = false
+    val capacity = intArrayOf(0, 0, 1, 2, 4, 8, 16, 32, 256, 50000)
+
+    //    val capacity = intArrayOf(2, 2, 2, 2, 2)
+    val clearParentNode = false
     var maxLevel = 0
-    fun checkMaxLevel(level: Int) {
+    fun updateMaxLevel(level: Int) {
         if (level > maxLevel)
             maxLevel = level
     }
+
     private val root = Node(this, rect, 0)
     fun insert(vec: Vec): Boolean = root.add(vec)
     fun draw(g: PGraphics) = root.draw(g)
@@ -22,20 +24,26 @@ class Quadtree(val rect: Rect) {
         root.query(queryRect, list)
         return list
     }
+    fun queryRects(queryRect: Rect): List<Rect> {
+        val inside = mutableListOf<Rect>()
+        val toCheck = mutableListOf<Rect>()
+        root.queryRects(queryRect, inside, toCheck)
+        return toCheck
+    }
 
 }
 
-private class Node(val tree: Quadtree, val rect: Rect, val level: Int): Rect(rect.x, rect.y, rect.width, rect.height) {
+private class Node(val tree: Quadtree, val rect: Rect, val level: Int) : Rect(rect.x, rect.y, rect.width, rect.height) {
     val points = mutableListOf<Vec>()
     var isCleared: Boolean = false
     var children = Array<Node?>(4) { null }
     val hasChildren: Boolean
-//        get() = (points.size == tree.capacity)
+        //        get() = (points.size == tree.capacity)
         get() = (children[0] != null)
 
 
     init {
-        tree.checkMaxLevel(level)
+        tree.updateMaxLevel(level)
     }
 
     fun add(vec: Vec): Boolean {
@@ -47,12 +55,12 @@ private class Node(val tree: Quadtree, val rect: Rect, val level: Int): Rect(rec
         } else {
             if (!hasChildren)
                 createChildren()
-                if (tree.emptyParentNode) {
-                    for (p in points)
-                        addToChild(p)
-                    points.clear()
-                    isCleared = true
-                }
+            if (tree.clearParentNode) {
+                for (p in points)
+                    addToChild(p)
+                points.clear()
+                isCleared = true
+            }
             addToChild(vec)
         }
         return true
@@ -78,6 +86,19 @@ private class Node(val tree: Quadtree, val rect: Rect, val level: Int): Rect(rec
         children[3] = Node(tree, lower2, level + 1)
     }
 
+    fun queryRects(queryRect: Rect, inside: MutableList<Rect>, toCheck: MutableList<Rect>) {
+        when {
+            !queryRect.intersects(rect) -> return
+            queryRect.inside(rect)  -> inside.add(rect)
+            points.size > 0  -> toCheck.add(rect)
+//            else -> toCheck.add(rect)
+        }
+        if (hasChildren) {
+            for (child in children)
+                child!!.queryRects(queryRect, inside, toCheck)
+        }
+    }
+
     fun query(queryRect: Rect, list: MutableList<Vec>) {
         if (!queryRect.intersects(rect))
             return
@@ -85,7 +106,7 @@ private class Node(val tree: Quadtree, val rect: Rect, val level: Int): Rect(rec
         if (queryRect.inside(rect))
             copyAll(list)
         else {
-           for (point in points) {
+            for (point in points) {
                 if (queryRect.contains(point))
                     list.add(point)
             }
