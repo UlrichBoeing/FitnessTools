@@ -1,6 +1,7 @@
 package de.ulrich_boeing.basics
 
 import processing.core.PGraphics
+import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -46,6 +47,8 @@ open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
             } else
                 field = value
         }
+    val center: Vec
+        get() = Vec(x + width / 2, y + height / 2)
 
     val aspectRatio: Float = width / height
 
@@ -106,13 +109,23 @@ open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
     infix fun intersects(other: Rect): Boolean =
         !(left > other.right || right < other.left || top > other.bottom || bottom < other.top)
 
+    infix fun outside(other: Rect) = !intersects(other)
+
     /**
-     * is other rect inside of this rect
+     * is this rect inside of other rect
      */
-    fun inside(other: Rect): Boolean =
-        !(other.left < left || other.right > right || other.top < top || other.bottom > bottom)
+    infix fun inside(other: Rect): Boolean =
+        !(left < other.left || right > other.right || top < other.top || bottom > other.bottom)
 
     fun inside(vec: Vec): Boolean = !(vec.x <= left || vec.x >= right || vec.y <= top || vec.y >= bottom)
+
+    infix fun inside(circle: Circle): Boolean {
+        // Finde den Eckpunkt des Rechtecks der am weitesten vom Mittelpunkt des Kreises entfernt ist
+        val dx = max(circle.center.x - left, right - circle.center.x)
+        val dy = max(circle.center.y - top, bottom - circle.center.y)
+        // Ist dieser Punkt kleiner wie der Radius, liegen alle Punkte innerhalb des Kreises
+        return dx.square() + dy.square() <= circle.radius.square()
+    }
 
     fun contains(vec: Vec): Boolean = !(vec.x < left || vec.x > right || vec.y < top || vec.y > bottom)
 
@@ -157,3 +170,6 @@ open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
 fun Rect.draw(g: PGraphics) {
     g.rect(this.x, this.y, this.width, this.height)
 }
+
+fun List<Rect>.draw(g: PGraphics) = forEach { it.draw(g) }
+

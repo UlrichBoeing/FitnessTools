@@ -33,6 +33,13 @@ class Timespan(val name: String = "timespan", var unit: Unit = Unit.MILLI) {
     val isRunning: Boolean
         get() = (startTime != 0L)
 
+    val lastTime: Long
+    get() =
+        if (list.isEmpty())
+            time
+        else
+            unit.convert(list.last())
+
     /**
      * Die seit start() vergangene Zeit in Nanosekunden,
      * Liefert 0, wenn Timespan noch nicht gestartet wurde
@@ -80,7 +87,7 @@ class Timespan(val name: String = "timespan", var unit: Unit = Unit.MILLI) {
         val abbr = unit.abbreviation
         return when {
             isRunning -> "$name is running: $time$abbr"
-            list.size == 1 -> "$name no.1: ${unit.convert(list.last())}$abbr"
+            list.size == 1 -> "$name no.1: $lastTime$abbr"
             list.isNotEmpty() -> "$name no.${list.size}: ${unit.convert(list.last())}$abbr - mean: ${mean()}$abbr"
             else -> "$name is just created"
         }

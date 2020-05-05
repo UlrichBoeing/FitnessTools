@@ -158,9 +158,10 @@ open class Vec(var x: Float, var y: Float) {
         return this + shift
     }
 
-
     infix fun to(vec: Vec): Vec = Vec(vec.x - x, vec.y - y)
     infix fun dot(vec: Vec): Float = x * vec.x + y * vec.y
+
+    infix fun inside(rect: Rect): Boolean = !(x < rect.left || x > rect.right || y < rect.top || y > rect.bottom)
 
     override fun toString(): String {
         val xStr = "%.2f".format(x)
