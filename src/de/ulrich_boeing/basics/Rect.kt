@@ -5,18 +5,27 @@ import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.random.Random
 
+interface Figure {
+    fun contains(vec: Vec): Boolean
+    fun pureContains(vec: Vec): Boolean
 
-open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
-    constructor(x: Int, y: Int, width: Int, height: Int) : this(
-        x.toFloat(),
-        y.toFloat(),
-        width.toFloat(),
-        height.toFloat()
-    )
+    fun contains(rect: Rect): Boolean
+    fun pureContains(rect: Rect): Boolean
 
-    constructor() : this(0f, 0f, 0f, 0f)
-    constructor(width: Int, height: Int) : this(0f, 0f, width.toFloat(), height.toFloat())
-    constructor(other: Rect) : this(other.x, other.y, other.width, other.height)
+    infix fun intersects(other: Rect): Boolean
+    infix fun pureIntersects(other: Rect): Boolean
+}
+
+
+class Rect(var x: Float, var y: Float, width: Float, height: Float) : Figure {
+    constructor(x: Int, y: Int, width: Int, height: Int) :
+            this(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat())
+    constructor() :
+            this(0f, 0f, 0f, 0f)
+    constructor(width: Int, height: Int) :
+            this(0f, 0f, width.toFloat(), height.toFloat())
+    constructor(other: Rect) :
+            this(other.x, other.y, other.width, other.height)
 
     companion object {
         fun fromCircle(center: Vec, radius: Float): Rect {
@@ -97,37 +106,21 @@ open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
             height = value - y
         }
 
-    /**
-     * returns false if only borders are intersecting
-     */
-    infix fun isOverlapping(other: Rect): Boolean =
+    override fun contains(vec: Vec): Boolean =
+        !(vec.x < left || vec.x > right || vec.y < top || vec.y > bottom)
+    override fun pureContains(vec: Vec): Boolean =
+        !(vec.x <= left || vec.x >= right || vec.y <= top || vec.y >= bottom)
+
+    override fun contains(other: Rect): Boolean =
+        !(left > other.left || right < other.right || top > other.top || bottom < other.bottom)
+    override fun pureContains(other: Rect): Boolean =
+        !(left >= other.left || right <= other.right || top >= other.top || bottom <= other.bottom)
+
+    override infix fun intersects(other: Rect): Boolean =
+        !(left > other.right || right < other.left || top > other.bottom || bottom < other.top)
+    override infix fun pureIntersects(other: Rect): Boolean =
         !(left >= other.right || right <= other.left || top >= other.bottom || bottom <= other.top)
 
-    /**
-     * returns true even if only borders are intersecting
-     */
-    infix fun intersects(other: Rect): Boolean =
-        !(left > other.right || right < other.left || top > other.bottom || bottom < other.top)
-
-    infix fun outside(other: Rect) = !intersects(other)
-
-    /**
-     * is this rect inside of other rect
-     */
-    infix fun inside(other: Rect): Boolean =
-        !(left < other.left || right > other.right || top < other.top || bottom > other.bottom)
-
-    fun inside(vec: Vec): Boolean = !(vec.x <= left || vec.x >= right || vec.y <= top || vec.y >= bottom)
-
-    infix fun inside(circle: Circle): Boolean {
-        // Finde den Eckpunkt des Rechtecks der am weitesten vom Mittelpunkt des Kreises entfernt ist
-        val dx = max(circle.center.x - left, right - circle.center.x)
-        val dy = max(circle.center.y - top, bottom - circle.center.y)
-        // Ist dieser Punkt kleiner wie der Radius, liegen alle Punkte innerhalb des Kreises
-        return dx.square() + dy.square() <= circle.radius.square()
-    }
-
-    fun contains(vec: Vec): Boolean = !(vec.x < left || vec.x > right || vec.y < top || vec.y > bottom)
 
     fun splitTo4(vec: Vec): List<Rect> {
         val rect1 = Rect(x, y, vec.x - x, vec.y - y)
@@ -148,7 +141,7 @@ open class Rect(var x: Float, var y: Float, width: Float, height: Float) {
 
     fun limit(other: Rect): Rect {
         val new = Rect(0, 0, 0, 0)
-        if (!isOverlapping(other))
+        if (!pureIntersects(other))
             return new
 
         new.left = if (other.left < left) left else other.left
