@@ -20,10 +20,13 @@ interface Figure {
 class Rect(var x: Float, var y: Float, width: Float, height: Float) : Figure {
     constructor(x: Int, y: Int, width: Int, height: Int) :
             this(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat())
+
     constructor() :
             this(0f, 0f, 0f, 0f)
+
     constructor(width: Int, height: Int) :
             this(0f, 0f, width.toFloat(), height.toFloat())
+
     constructor(other: Rect) :
             this(other.x, other.y, other.width, other.height)
 
@@ -108,16 +111,19 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) : Figure {
 
     override fun contains(vec: Vec): Boolean =
         !(vec.x < left || vec.x > right || vec.y < top || vec.y > bottom)
+
     override fun pureContains(vec: Vec): Boolean =
         !(vec.x <= left || vec.x >= right || vec.y <= top || vec.y >= bottom)
 
     override fun contains(other: Rect): Boolean =
         !(left > other.left || right < other.right || top > other.top || bottom < other.bottom)
+
     override fun pureContains(other: Rect): Boolean =
         !(left >= other.left || right <= other.right || top >= other.top || bottom <= other.bottom)
 
     override infix fun intersects(other: Rect): Boolean =
         !(left > other.right || right < other.left || top > other.bottom || bottom < other.top)
+
     override infix fun pureIntersects(other: Rect): Boolean =
         !(left >= other.right || right <= other.left || top >= other.bottom || bottom <= other.top)
 
@@ -152,12 +158,8 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) : Figure {
         return new
     }
 
-    fun listOfRandomVec(num: Int) = List(num) {
-        Vec(
-            x + Random.nextFloat() * width,
-            y + Random.nextFloat() * height
-        )
-    }
+    fun listOfRandomVec(num: Int) = List(num) {randomVec() }
+    fun randomVec() = Vec(x + Random.nextFloat() * width, y + Random.nextFloat() * height)
 }
 
 fun Rect.draw(g: PGraphics) {
