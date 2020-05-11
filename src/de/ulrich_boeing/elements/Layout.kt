@@ -35,9 +35,7 @@ class Layout(app: PApplet, image: PImage) {
 
             return field
         }
-        private set(value) {
-            field = value
-        }
+        private set
 
 
     fun add(e: Element) {

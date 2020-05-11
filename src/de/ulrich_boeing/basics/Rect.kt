@@ -41,7 +41,6 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) : Figure {
     }
 
     var width: Float = 0f
-        get() = field
         set(value) {
             if (value < 0f) {
                 println("Width $value in Rect can not be negative.")
@@ -51,7 +50,6 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) : Figure {
         }
 
     var height: Float = 0f
-        get() = field
         set(value) {
             if (value < 0f) {
                 println("Height $value in Rect can not be negative.")
@@ -158,6 +156,11 @@ class Rect(var x: Float, var y: Float, width: Float, height: Float) : Figure {
         return new
     }
 
+    /**
+     * Returns a new Rectangle inside the old thus creating a margin
+     */
+    fun withMargin(margin: Float)= Rect(x + margin, y + margin, width - 2 * margin, height - 2 * margin)
+
     fun listOfRandomVec(num: Int) = List(num) {randomVec() }
     fun randomVec() = Vec(x + Random.nextFloat() * width, y + Random.nextFloat() * height)
 }
@@ -167,4 +170,5 @@ fun Rect.draw(g: PGraphics) {
 }
 
 fun List<Rect>.draw(g: PGraphics) = forEach { it.draw(g) }
+
 

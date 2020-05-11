@@ -36,8 +36,7 @@ class CanvasLayer(
 //    private var curLayer = SizeableCanvas(this, sizes, null)
 //    private var _curLayer: Int = 1
     var curLayer: Int = 1
-            get() = field
-            set(index) {
+    set(index) {
                 if (!layers.containsKey(index)) {
                     layers[index] = SizeableCanvas(this, sizes, null)
                     layers = layers.toSortedMap()

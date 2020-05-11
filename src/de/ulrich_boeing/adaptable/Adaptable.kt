@@ -35,7 +35,6 @@ open class Adaptable(val app: PApplet, val frame: Clipping) {
     val stats = AdaptableStats()
 
     var populationCount = 0
-        get() = field
         set(value) {
             field = value
             population = initPopulation(value)

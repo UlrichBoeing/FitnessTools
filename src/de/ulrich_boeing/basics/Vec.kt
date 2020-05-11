@@ -250,4 +250,13 @@ fun Vec.drawAsCircle(g: PGraphics, radius : Float = 8f) {
 fun Vec.toPoint(canvas: CanvasLayer): Point = Point(this, canvas.getColor(this))
 
 
-
+/**
+ * A point divides a plane into four squares.
+ * (upper1 -> 0, upper2 -> 1, lower1 -> 2, lower2 -> 3
+ * quadIndex returns the index for vector this
+ */
+fun Vec.quadIndex(splitPoint: Vec): Int {
+    val xIndex = if (x <= splitPoint.x) 0 else 1
+    val yIndex = if (y <= splitPoint.y) 0 else 2
+    return xIndex + yIndex
+}

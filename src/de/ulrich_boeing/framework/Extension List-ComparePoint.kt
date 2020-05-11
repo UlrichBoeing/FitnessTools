@@ -38,7 +38,7 @@ fun List<ComparePoint>.indexOfFirstDif(limit: Int): Int {
     val maxDif = this.maxBy { it.rgbDif }
     var newLimit = limit
     if (maxDif!!.rgbDif < 100)
-        newLimit = maxDif!!.rgbDif / 2
+        newLimit = maxDif.rgbDif / 2
 
     var i = 0
     while (i < this.size) {
@@ -55,7 +55,7 @@ fun List<ComparePoint>.indexOfFirstBrightDif(limit: Float): Int {
     val maxDif = this.maxBy { it.brightDif }
     var newLimit = limit
     if (maxDif!!.brightDif < 0.4)
-        newLimit = maxDif!!.brightDif / 2
+        newLimit = maxDif.brightDif / 2
 
     var i = 0
     while (i < this.size) {

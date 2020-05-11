@@ -38,7 +38,7 @@ class FloatRange(start: Float, end: Float = start) {
     /**
      *  The inverse function to normalize ✔
      */
-    public fun expand(value: Float): Float =
+    fun expand(value: Float): Float =
         if (constant) min
         else min + value * (max - min)
 

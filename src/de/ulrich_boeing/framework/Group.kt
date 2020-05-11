@@ -3,7 +3,7 @@ package de.ulrich_boeing.framework
 import de.ulrich_boeing.drawables.Drawable
 import processing.core.PGraphics
 
-class Group() {
+class Group {
     private val list = mutableListOf<Drawable>()
 
     fun draw(g: PGraphics, size: Float) {

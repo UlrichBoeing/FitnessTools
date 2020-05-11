@@ -47,6 +47,9 @@ inline fun Int.setBlue(blue: Int): Int =
  */
 fun Int.getBrightness(): Int = (0.2126f * red + 0.7152 * green + 0.0722 * blue).toInt()
 
+inline fun Int.Companion.fromRGBA(red: Float, green: Float, blue: Float, alpha: Float) =
+    Int.fromRGBA(red.toInt(), green.toInt(), blue.toInt(), alpha.toInt())
+
 inline fun Int.Companion.fromRGBA(red: Int, green: Int, blue: Int, alpha: Int): Int =
     (alpha shl 24) or (red shl 16) or (green shl 8) or blue
 

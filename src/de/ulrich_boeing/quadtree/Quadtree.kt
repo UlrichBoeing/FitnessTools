@@ -18,19 +18,13 @@ fun createIntArray(size: Int, factor: Float = 1f, startPos: Int = 1, startValue:
 
 class Quadtree(list: List<Vec>, val rect: Rect, val capacity: IntArray) {
     var countNodes: Int = 0
-        get() = field
-        private set(value) {
-            field = value
-        }
+        private set
 
     private val root = Node(this, rect, 0)
 
     // deepest Level of all nodes
     var maxLevel: Int = 0
-        get() = field
-        private set(value) {
-            field = value
-        }
+        private set
 
     init {
         list.forEach { insert(it) }

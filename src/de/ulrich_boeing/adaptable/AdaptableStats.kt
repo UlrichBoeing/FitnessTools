@@ -4,7 +4,7 @@ import de.ulrich_boeing.basics.HistoryList
 
 class PopulationStats(val bestFitness: Float, val worstFitness: Float)
 
-class AdaptableStats() {
+class AdaptableStats {
     val history = HistoryList<PopulationStats>(5)
 
 
