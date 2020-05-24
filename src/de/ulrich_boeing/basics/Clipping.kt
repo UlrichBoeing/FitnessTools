@@ -34,9 +34,6 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
             Clipping(rect.x.roundToInt(), rect.y.roundToInt(), rect.width.roundToInt(), rect.height.roundToInt())
     }
 
-    var color = COLOR_WHITE
-    var strokeWeight = 0f
-
     var width = width
         set(value) {
             field = if (value > 0) value else 0
@@ -265,10 +262,12 @@ class Clipping(var x: Int, var y: Int, width: Int, height: Int) {
     }
 
     fun draw(g: PGraphics) {
-        g.set(color, strokeWeight)
         g.rect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat())
     }
+
 }
+
+
 
 class PointClipping(var x1: Int, var y1: Int, var x2: Int, var y2: Int) {
     val clipping: Clipping
