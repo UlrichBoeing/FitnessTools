@@ -14,6 +14,7 @@ const val COLOR_BLUE = 0xFF0000FF.toInt()
 const val COLOR_YELLOW = 0xFFFFFF00.toInt()
 const val COLOR_AQUA  = 0xFF00FFFF.toInt()
 const val COLOR_FUCHSIA = 0xFFFF00FF.toInt()
+const val COLOR_SHIFFMAN = 0xFF333333.toInt()
 
 inline val Int.red: Int
     get() = (this shr 16) and 0xFF

@@ -1,7 +1,7 @@
 package de.ulrich_boeing.canvas
 
 import de.ulrich_boeing.drawables.Drawable
-import org.tinylog.kotlin.Logger
+import org.tinylog.Logger
 import processing.core.PApplet
 import processing.core.PGraphics
 import processing.core.PImage
@@ -35,7 +35,7 @@ internal class SizeableCanvas(val parent: CanvasLayer, sizes: Map<CanvasSize, Fl
     fun add(drawable: Drawable) {
         if (!readOnly) {
             list.add(drawable)
-            Logger.info("Element ${list.lastIndex} added to list.")
+            Logger.info {"Element ${list.lastIndex} added to list."}
         }
     }
 
